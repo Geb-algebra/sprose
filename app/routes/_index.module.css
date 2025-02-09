@@ -1,0 +1,28 @@
+.bodyLayout {
+	width: 100%;
+	height: 100vh;
+	padding: 8px;
+	display: grid;
+	grid-template-columns: minmax(256px, auto) 40px 40px 1fr;
+	grid-template-rows: 40px 1fr;
+	gap: 8px;
+	grid-template-areas:
+		"title file-upload export ."
+		"main main main main";
+}
+
+.title {
+	grid-area: title;
+}
+
+.fileUpload {
+	grid-area: file-upload;
+}
+
+.export {
+	grid-area: export;
+}
+
+.main {
+	grid-area: main;
+}

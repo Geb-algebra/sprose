@@ -1,0 +1,17 @@
+.collapsedLayout {
+	display: grid;
+	gap: 8px;
+	align-items: start;
+	justify-items: start;
+	grid-auto-flow: row;
+	place-content: start;
+}
+
+.expandedLayout {
+	display: grid;
+	gap: 8px;
+	align-items: start;
+	justify-items: start;
+	grid-auto-flow: column;
+	place-content: start;
+}
