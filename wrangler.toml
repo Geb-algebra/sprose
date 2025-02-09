@@ -1,0 +1,9 @@
+workers_dev = true
+name = "frizz-stack"
+compatibility_date = "2025-02-09"
+main = "./worker.ts"
+
+[assets]
+directory = "./build/client/"
+binding = "ASSETS"
+run_worker_first = false
