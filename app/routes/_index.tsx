@@ -71,7 +71,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 				<DownloadIcon />
 			</Button>
 			<main className={cn(styles.main, "rounded-md bg-white shadow-md p-2")}>
-				<ItemFamily item={loaderData} />
+				<ItemFamily item={loaderData} isParentExpanded={true} />
 			</main>
 		</div>
 	);

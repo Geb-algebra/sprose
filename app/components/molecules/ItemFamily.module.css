@@ -1,6 +1,29 @@
+.layout {
+	display: grid;
+	grid-template-columns: 1fr 32px;
+	grid-template-rows: 32px 1fr;
+	gap: 0;
+	width: fit-content;
+	grid-template-areas:
+		"content handle"
+		"content expand";
+}
+
+.content {
+	grid-area: content;
+}
+
+.handle {
+	grid-area: handle;
+}
+
+.expand {
+	grid-area: expand;
+}
+
 .collapsedLayout {
 	display: grid;
-	gap: 8px;
+	gap: 0px;
 	align-items: start;
 	justify-items: start;
 	grid-auto-flow: row;
@@ -9,7 +32,7 @@
 
 .expandedLayout {
 	display: grid;
-	gap: 8px;
+	gap: 0px;
 	align-items: start;
 	justify-items: start;
 	grid-auto-flow: column;

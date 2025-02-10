@@ -1,15 +1,45 @@
 import type { Item } from "~/models";
 import { cn } from "~/utils/css";
+import styles from "./ItemCard.module.css";
 
-export default function ItemCard(props: { item: Item; className?: string }) {
+function PseudoCard(props: { className?: string }) {
 	return (
 		<div
 			className={cn(
-				"w-48 h-16 rounded-b-md bg-slate-100 shadow-sm grid place-items-center",
 				props.className,
+				"w-48 h-16 shadow-sm bg-slate-100 rounded-md p-2",
+			)}
+		/>
+	);
+}
+
+export default function ItemCard(props: {
+	item: Item;
+	isStacked: boolean;
+	className?: string;
+}) {
+	return (
+		<div
+			className={cn(
+				"w-[200px] h-[72px] relative",
+				props.className,
+				styles.layout,
 			)}
 		>
-			{props.item.description}
+			<p
+				className={cn(
+					styles.content,
+					"absolute top-0 left-0 z-20 w-48 h-16 bg-slate-100 shadow-sm rounded-md p-2 text-sm mb-2 mr-2",
+				)}
+			>
+				{props.item.description}
+			</p>
+			{props.isStacked ? (
+				<>
+					<PseudoCard className="absolute top-[2px] left-[2px] z-10" />
+					<PseudoCard className="absolute top-[4px] left-[4px] z-5" />
+				</>
+			) : null}
 		</div>
 	);
 }
