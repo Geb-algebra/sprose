@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Item } from "~/models";
-import ItemCard from "../atoms/ItemCard";
+import ItemCard from "./ItemCard";
 
 import {
 	ChevronLeftIcon,
@@ -8,7 +8,7 @@ import {
 	GripHorizontalIcon,
 } from "lucide-react";
 import { cn } from "~/utils/css";
-import { Button } from "../atoms/Button";
+import { Button } from "./Button";
 import styles from "./ItemFamily.module.css";
 
 export default function ItemFamily(props: {
