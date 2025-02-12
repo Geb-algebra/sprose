@@ -1,0 +1,38 @@
+.layout {
+	display: grid;
+	grid-template-columns: 40px 20px 40px 20px 40px;
+	grid-template-rows: 40px 20px;
+	grid-template-areas:
+		"import inarrow database exarrow export"
+		".      .     sync     status     .";
+	align-items: center;
+	justify-items: center;
+}
+
+.import {
+	grid-area: import;
+}
+
+.inarrow {
+	grid-area: inarrow;
+}
+
+.database {
+	grid-area: database;
+}
+
+.exarrow {
+	grid-area: exarrow;
+}
+
+.export {
+	grid-area: export;
+}
+
+.sync {
+	grid-area: sync;
+}
+
+.status {
+	grid-area: status;
+}

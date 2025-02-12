@@ -1,4 +1,4 @@
-import type { Item } from "~/models";
+import type { Item } from "~/map/models";
 import { cn } from "~/utils/css";
 import styles from "./ItemCard.module.css";
 

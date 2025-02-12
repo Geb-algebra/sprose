@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Item } from "~/models";
+import type { Item } from "~/map/models";
 import ItemCard from "./ItemCard";
 
 import {
