@@ -14,12 +14,17 @@ import styles from "./ItemFamily.module.css";
 export default function ItemFamily(props: {
 	item: Item;
 	isParentExpanded: boolean;
+	onChangeDescription: (description: string, itemId: string) => void;
 	className?: string;
 }) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	if (!props.isParentExpanded) {
 		return (
-			<ItemCard item={props.item} isStacked={props.item.children.length > 0} />
+			<ItemCard
+				item={props.item}
+				isStacked={props.item.children.length > 0}
+				onChangeDescription={props.onChangeDescription}
+			/>
 		);
 	}
 	return (
@@ -36,13 +41,18 @@ export default function ItemFamily(props: {
 					styles.content,
 				)}
 			>
-				<ItemCard item={props.item} isStacked={false} />
+				<ItemCard
+					item={props.item}
+					isStacked={false}
+					onChangeDescription={props.onChangeDescription}
+				/>
 				{props.item.children.map((child) =>
 					child.children.length > 0 ? (
 						<ItemFamily
 							key={child.id}
 							item={child}
 							isParentExpanded={isExpanded}
+							onChangeDescription={props.onChangeDescription}
 							className={isExpanded ? "row-start-2" : ""}
 						/>
 					) : (
@@ -50,6 +60,7 @@ export default function ItemFamily(props: {
 							key={child.id}
 							item={child}
 							isStacked={false}
+							onChangeDescription={props.onChangeDescription}
 							className={isExpanded ? "row-start-2" : ""}
 						/>
 					),

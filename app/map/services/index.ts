@@ -61,3 +61,19 @@ export function serializeItemToMarkdown(item: Item, level: number): string {
 export function serializeItemsToMarkdown(items: Item[]): string {
 	return items.map((item) => serializeItemToMarkdown(item, 0)).join("\n");
 }
+
+export function updateItemDescription(
+	itemId: string,
+	description: string,
+	items: Item[],
+): Item[] {
+	return items.map((item) => {
+		if (item.id === itemId) {
+			return { ...item, description };
+		}
+		return {
+			...item,
+			children: updateItemDescription(itemId, description, item.children),
+		};
+	});
+}

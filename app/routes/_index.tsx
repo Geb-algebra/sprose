@@ -1,39 +1,45 @@
 import { cn } from "~/utils/css";
 import styles from "./_index.module.css";
 
+import { useFetcher } from "react-router";
 import ItemFamily from "~/components/ItemFamily";
 import { MapRepository } from "~/map/lifecycle";
-import { parseMarkdownToItems, serializeItemsToMarkdown } from "~/map/services";
+import {
+	serializeItemsToMarkdown,
+	updateItemDescription,
+} from "~/map/services";
 import type { Route } from "./+types/_index";
 import { DataStatus } from "./data-status";
 
 export async function clientLoader() {
+	console.debug("revalidated index");
 	return await MapRepository.get();
 }
 
-export async function clientAction({ request }: Route.ClientActionArgs) {
-	const formData = await request.formData();
-	const markdownFile = formData.get("markdownFile");
-	if (!(markdownFile instanceof File)) {
-		return { error: "Invalid file input, expected a File." };
-	}
-	const fileText = await markdownFile.text();
-	await MapRepository.save(parseMarkdownToItems(fileText));
-	return { success: true };
-}
-
 export default function Page({ loaderData: items }: Route.ComponentProps) {
+	const fetcher = useFetcher();
+	const handleChangeDescription = (description: string, itemId: string) => {
+		const newItems = updateItemDescription(itemId, description, items);
+		fetcher.submit(
+			{ markdownText: serializeItemsToMarkdown(newItems) },
+			{ method: "POST", action: "/data-status" },
+		);
+	};
+
 	return (
 		<div className={cn(styles.bodyLayout, "bg-slate-200")}>
 			<h1 className={cn(styles.title, "text-2xl text-slate-400 px-2")}>
 				User Story Mapper
 			</h1>
 			<DataStatus currentMarkdownText={serializeItemsToMarkdown(items)} />
-			{/* <ImportMarkdownButton className={styles.fileUpload} />
-			<ExportMarkdownButton className={styles.export} /> */}
 			<main className={cn(styles.main, "rounded-md bg-white shadow-md p-2")}>
 				{items.map((item) => (
-					<ItemFamily key={item.id} item={item} isParentExpanded />
+					<ItemFamily
+						key={item.id}
+						item={item}
+						isParentExpanded
+						onChangeDescription={handleChangeDescription}
+					/>
 				))}
 			</main>
 		</div>

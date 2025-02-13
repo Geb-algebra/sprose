@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Item } from "~/map/models";
-import { parseMarkdownToItems, serializeItemsToMarkdown } from "./index";
+import {
+	parseMarkdownToItems,
+	serializeItemsToMarkdown,
+	updateItemDescription,
+} from "./index";
 
 describe("parseMarkdownToItems", () => {
 	it("should parse a simple markdown list into items", () => {
@@ -120,5 +124,115 @@ describe("serializeItemsToMarkdown", () => {
 		const items: Item[] = [];
 		const result = serializeItemsToMarkdown(items);
 		expect(result).toEqual("");
+	});
+});
+
+describe("updateItemDescription", () => {
+	it("should update the description of a root item", () => {
+		const items: Item[] = [
+			{
+				id: "1",
+				description: "Item 1",
+				children: [
+					{
+						id: "2",
+						description: "Item 2",
+						children: [
+							{ id: "5", description: "Item 5", children: [] },
+							{ id: "6", description: "Item 6", children: [] },
+						],
+					},
+					{ id: "3", description: "Item 3", children: [] },
+					{
+						id: "4",
+						description: "Item 4",
+						children: [{ id: "7", description: "Item 7", children: [] }],
+					},
+				],
+			},
+		];
+
+		const updatedItems = updateItemDescription("1", "Updated Item 1", items);
+		expect(updatedItems).toEqual([
+			{
+				id: "1",
+				description: "Updated Item 1",
+				children: [
+					{
+						id: "2",
+						description: "Item 2",
+						children: [
+							{ id: "5", description: "Item 5", children: [] },
+							{ id: "6", description: "Item 6", children: [] },
+						],
+					},
+					{ id: "3", description: "Item 3", children: [] },
+					{
+						id: "4",
+						description: "Item 4",
+						children: [{ id: "7", description: "Item 7", children: [] }],
+					},
+				],
+			},
+		]);
+	});
+
+	it("should update the description of an item that is a child of a child", () => {
+		const items: Item[] = [
+			{
+				id: "1",
+				description: "Item 1",
+				children: [
+					{
+						id: "2",
+						description: "Item 2",
+						children: [
+							{ id: "5", description: "Item 5", children: [] },
+							{
+								id: "6",
+								description: "Item 6",
+								children: [{ id: "8", description: "Item 8", children: [] }],
+							},
+						],
+					},
+					{ id: "3", description: "Item 3", children: [] },
+					{
+						id: "4",
+						description: "Item 4",
+						children: [{ id: "7", description: "Item 7", children: [] }],
+					},
+				],
+			},
+		];
+
+		const updatedItems = updateItemDescription("8", "Updated Item 8", items);
+		expect(updatedItems).toEqual([
+			{
+				id: "1",
+				description: "Item 1",
+				children: [
+					{
+						id: "2",
+						description: "Item 2",
+						children: [
+							{ id: "5", description: "Item 5", children: [] },
+							{
+								id: "6",
+								description: "Item 6",
+								children: [
+									{ id: "8", description: "Updated Item 8", children: [] },
+								],
+							},
+						],
+					},
+					{ id: "3", description: "Item 3", children: [] },
+					{
+						id: "4",
+						description: "Item 4",
+						children: [{ id: "7", description: "Item 7", children: [] }],
+					},
+				],
+			},
+		]);
 	});
 });

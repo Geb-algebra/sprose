@@ -27,7 +27,7 @@ export async function clientLoader() {
 }
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
-	await new Promise((resolve) => setTimeout(resolve, 500));
+	// await new Promise((resolve) => setTimeout(resolve, 500));
 	const formData = await request.formData();
 	const markdownText = formData.get("markdownText");
 	if (!(typeof markdownText === "string")) {
@@ -48,7 +48,6 @@ export function DataStatus(props: { currentMarkdownText: string }) {
 	console.log("data", fetcher.data);
 	React.useEffect(() => {
 		const timeoutId = setTimeout(() => {
-			console.log("sending");
 			if (!isInSync) {
 				const formData = new FormData();
 				formData.append("markdownText", props.currentMarkdownText);

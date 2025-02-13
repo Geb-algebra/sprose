@@ -1,5 +1,5 @@
 import type { Item } from "~/map/models";
-import { cn } from "~/utils/css";
+import { cn, focusVisibleStyle } from "~/utils/css";
 import styles from "./ItemCard.module.css";
 
 function PseudoCard(props: { className?: string }) {
@@ -15,6 +15,7 @@ function PseudoCard(props: { className?: string }) {
 
 export default function ItemCard(props: {
 	item: Item;
+	onChangeDescription: (description: string, itemId: string) => void;
 	isStacked: boolean;
 	className?: string;
 }) {
@@ -26,14 +27,17 @@ export default function ItemCard(props: {
 				styles.layout,
 			)}
 		>
-			<p
+			<textarea
 				className={cn(
 					styles.content,
-					"absolute top-0 left-0 z-20 w-48 h-16 bg-slate-100 shadow-sm rounded-md p-2 text-sm mb-2 mr-2",
+					focusVisibleStyle,
+					"absolute top-0 left-0 z-20 w-48 h-16 bg-slate-100 shadow-sm rounded-md p-2 text-sm mb-2 mr-2 resize-none",
 				)}
-			>
-				{props.item.description}
-			</p>
+				defaultValue={props.item.description}
+				onBlur={(e) => {
+					props.onChangeDescription(e.target.value, props.item.id);
+				}}
+			/>
 			{props.isStacked ? (
 				<>
 					<PseudoCard className="absolute top-[2px] left-[2px] z-10" />
