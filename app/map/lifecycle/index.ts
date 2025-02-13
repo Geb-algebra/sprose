@@ -29,3 +29,11 @@ export class MapRepository {
 		return await localforage.removeItem(MapRepository.KEY);
 	}
 }
+
+function generateId(): string {
+	return Math.random().toString(36).substr(2, 9);
+}
+
+export function createNewItem(description: string): Item {
+	return { id: generateId(), description, children: [] };
+}

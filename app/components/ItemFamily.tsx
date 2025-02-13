@@ -2,21 +2,17 @@ import { useState } from "react";
 import type { Item } from "~/map/models";
 import ItemCard from "./ItemCard";
 
-import {
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	GripHorizontalIcon,
-} from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "~/utils/css";
+import AddItemCardButton from "./AddItemCardButton";
 import { Button } from "./Button";
 import styles from "./ItemFamily.module.css";
-import AddItemCardButton from "./AddItemCardButton";
 
 export default function ItemFamily(props: {
 	item: Item;
 	isParentExpanded: boolean;
 	onChangeDescription: (description: string, itemId: string) => void;
-	onAddItem: (parentId: string) => void;
+	onFinishWritingNewItem: (parentId: string, description: string) => void;
 	className?: string;
 }) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -54,13 +50,13 @@ export default function ItemFamily(props: {
 						item={child}
 						isParentExpanded={isExpanded}
 						onChangeDescription={props.onChangeDescription}
-						onAddItem={props.onAddItem}
+						onFinishWritingNewItem={props.onFinishWritingNewItem}
 						className={isExpanded ? "row-start-2" : ""}
 					/>
 				))}
 				<AddItemCardButton
-					onClick={() => {
-						props.onAddItem(props.item.id);
+					onFinishWriting={(description) => {
+						props.onFinishWritingNewItem(props.item.id, description);
 					}}
 					className={isExpanded ? "row-start-2" : ""}
 				/>

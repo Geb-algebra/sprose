@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Item, Item } from "~/map/models";
+import type { Item } from "~/map/models";
 import {
 	addNewItem,
 	parseMarkdownToMap,

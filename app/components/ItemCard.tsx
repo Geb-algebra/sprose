@@ -28,6 +28,7 @@ export default function ItemCard(props: {
 			)}
 		>
 			<textarea
+				id={props.item.id}
 				className={cn(
 					styles.content,
 					focusVisibleStyle,

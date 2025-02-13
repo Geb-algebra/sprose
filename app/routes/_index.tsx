@@ -3,8 +3,12 @@ import styles from "./_index.module.css";
 
 import { useFetcher } from "react-router";
 import ItemFamily from "~/components/ItemFamily";
-import { MapRepository } from "~/map/lifecycle";
-import { serializeMapToMarkdown, updateItemDescription } from "~/map/services";
+import { MapRepository, createNewItem } from "~/map/lifecycle";
+import {
+	addNewItem,
+	serializeMapToMarkdown,
+	updateItemDescription,
+} from "~/map/services";
 import type { Route } from "./+types/_index";
 import { DataStatus } from "./data-status";
 
@@ -21,6 +25,15 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 			{ markdownText: serializeMapToMarkdown(newMap) },
 			{ method: "POST", action: "/data-status" },
 		);
+	};
+	const handleAddItem = async (parentId: string, description: string) => {
+		const newItem = createNewItem(description);
+		const newMap = addNewItem(parentId, map, newItem);
+		await fetcher.submit(
+			{ markdownText: serializeMapToMarkdown(newMap) },
+			{ method: "POST", action: "/data-status" },
+		);
+		document.getElementById(newItem.id)?.focus();
 	};
 
 	return (
@@ -41,9 +54,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 						item={item}
 						isParentExpanded
 						onChangeDescription={handleChangeDescription}
-						onAddItem={(parentId) => {
-							console.log("add item", parentId);
-						}}
+						onFinishWritingNewItem={handleAddItem}
 					/>
 				))}
 			</main>
