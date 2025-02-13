@@ -10,11 +10,13 @@ import {
 import { cn } from "~/utils/css";
 import { Button } from "./Button";
 import styles from "./ItemFamily.module.css";
+import AddItemCardButton from "./AddItemCardButton";
 
 export default function ItemFamily(props: {
 	item: Item;
 	isParentExpanded: boolean;
 	onChangeDescription: (description: string, itemId: string) => void;
+	onAddItem: (parentId: string) => void;
 	className?: string;
 }) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -30,7 +32,7 @@ export default function ItemFamily(props: {
 	return (
 		<div
 			className={cn(
-				"bg-slate-200 rounded-sm shadow-sm",
+				"bg-white rounded-sm border border-slate-200 mr-2 mb-2",
 				styles.layout,
 				props.className,
 			)}
@@ -46,35 +48,28 @@ export default function ItemFamily(props: {
 					isStacked={false}
 					onChangeDescription={props.onChangeDescription}
 				/>
-				{props.item.children.map((child) =>
-					child.children.length > 0 ? (
-						<ItemFamily
-							key={child.id}
-							item={child}
-							isParentExpanded={isExpanded}
-							onChangeDescription={props.onChangeDescription}
-							className={isExpanded ? "row-start-2" : ""}
-						/>
-					) : (
-						<ItemCard
-							key={child.id}
-							item={child}
-							isStacked={false}
-							onChangeDescription={props.onChangeDescription}
-							className={isExpanded ? "row-start-2" : ""}
-						/>
-					),
-				)}
+				{props.item.children.map((child) => (
+					<ItemFamily
+						key={child.id}
+						item={child}
+						isParentExpanded={isExpanded}
+						onChangeDescription={props.onChangeDescription}
+						onAddItem={props.onAddItem}
+						className={isExpanded ? "row-start-2" : ""}
+					/>
+				))}
+				<AddItemCardButton
+					onClick={() => {
+						props.onAddItem(props.item.id);
+					}}
+					className={isExpanded ? "row-start-2" : ""}
+				/>
 			</div>
-
-			<GripHorizontalIcon
-				className={cn(styles.handle, "w-4 h-4 m-2 text-slate-400")}
-			/>
 			<Button
 				type="button"
 				variant="ghost"
 				size="icon"
-				className={cn(styles.expand, "w-8 h-8 hover:bg-slate-300")}
+				className={cn(styles.expand, "w-4 h-20 ml-auto hover:bg-slate-300")}
 				onClick={() => setIsExpanded(!isExpanded)}
 			>
 				{isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}

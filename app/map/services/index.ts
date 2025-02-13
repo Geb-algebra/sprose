@@ -1,26 +1,6 @@
-import type { Item } from "~/map/models";
+import type { Item, Item } from "~/map/models";
 
-/**
- * Parses a markdown string into a hierarchical tree of items.
- *
- * This function takes a markdown string where each non-empty line represents an item.
- * The level of each item is determined by the number of leading whitespace characters.
- * Items with greater indentation are considered children of the nearest less-indented item.
- *
- * For example, given the markdown:
- *
- *   - Item 1
- *     - Item 1.1
- *     - Item 1.2
- *   - Item 2
- *
- * The function will produce a tree where "Item 1" has two children ("Item 1.1" and "Item 1.2"),
- * and "Item 2" is a separate root item.
- *
- * @param markdown - A string containing markdown formatted list items, with each line starting with a dash.
- * @returns An array of root items, each possibly containing nested children.
- */
-export function parseMarkdownToItems(markdown: string): Item[] {
+export function parseMarkdownToMap(markdown: string): Item {
 	const lines = markdown.split("\n").filter((line) => line.trim() !== "");
 	const rootItems: Item[] = [];
 	const stack: { item: Item; level: number }[] = [];
@@ -43,14 +23,18 @@ export function parseMarkdownToItems(markdown: string): Item[] {
 		stack.push({ item: newItem, level });
 	}
 
-	return rootItems;
+	return {
+		id: "__root",
+		description: "",
+		children: rootItems,
+	} as Item;
 }
 
 function generateId(): string {
 	return Math.random().toString(36).substr(2, 9);
 }
 
-export function serializeItemToMarkdown(item: Item, level: number): string {
+function serializeItemToMarkdown(item: Item, level: number): string {
 	const indent = "  ".repeat(level);
 	const children = item.children
 		.map((child) => serializeItemToMarkdown(child, level + 1))
@@ -58,22 +42,41 @@ export function serializeItemToMarkdown(item: Item, level: number): string {
 	return `${indent}- ${item.description}${children ? `\n${children}` : ""}`;
 }
 
-export function serializeItemsToMarkdown(items: Item[]): string {
-	return items.map((item) => serializeItemToMarkdown(item, 0)).join("\n");
+export function serializeMapToMarkdown(map: Item): string {
+	return serializeItemToMarkdown(map, 0)
+		.split("\n")
+		.slice(1)
+		.map((line) => (line.startsWith("  ") ? line.slice(2) : line))
+		.join("\n");
 }
 
 export function updateItemDescription(
+	items: Item,
 	itemId: string,
-	description: string,
-	items: Item[],
-): Item[] {
-	return items.map((item) => {
-		if (item.id === itemId) {
-			return { ...item, description };
-		}
-		return {
-			...item,
-			children: updateItemDescription(itemId, description, item.children),
-		};
-	});
+	newDescription: string,
+): Item {
+	if (items.id === itemId) {
+		return { ...items, description: newDescription };
+	}
+	return {
+		...items,
+		children: items.children.map((child) =>
+			updateItemDescription(child, itemId, newDescription),
+		),
+	};
+}
+
+/**
+ * Adds a new item as a child of the item with the given ID.
+ * if no ID is provided, the item is added as a root item.
+ */
+export function addNewItem(parentId: string, item: Item): Item {
+	const newItem: Item = { id: generateId(), description: "", children: [] };
+	if (parentId === item.id) {
+		return { ...item, children: [...item.children, newItem] };
+	}
+	return {
+		...item,
+		children: item.children.map((child) => addNewItem(parentId, child)),
+	};
 }

@@ -4,10 +4,7 @@ import styles from "./_index.module.css";
 import { useFetcher } from "react-router";
 import ItemFamily from "~/components/ItemFamily";
 import { MapRepository } from "~/map/lifecycle";
-import {
-	serializeItemsToMarkdown,
-	updateItemDescription,
-} from "~/map/services";
+import { serializeMapToMarkdown, updateItemDescription } from "~/map/services";
 import type { Route } from "./+types/_index";
 import { DataStatus } from "./data-status";
 
@@ -16,12 +13,12 @@ export async function clientLoader() {
 	return await MapRepository.get();
 }
 
-export default function Page({ loaderData: items }: Route.ComponentProps) {
+export default function Page({ loaderData: map }: Route.ComponentProps) {
 	const fetcher = useFetcher();
 	const handleChangeDescription = (description: string, itemId: string) => {
-		const newItems = updateItemDescription(itemId, description, items);
+		const newMap = updateItemDescription(map, itemId, description);
 		fetcher.submit(
-			{ markdownText: serializeItemsToMarkdown(newItems) },
+			{ markdownText: serializeMapToMarkdown(newMap) },
 			{ method: "POST", action: "/data-status" },
 		);
 	};
@@ -31,14 +28,22 @@ export default function Page({ loaderData: items }: Route.ComponentProps) {
 			<h1 className={cn(styles.title, "text-2xl text-slate-400 px-2")}>
 				User Story Mapper
 			</h1>
-			<DataStatus currentMarkdownText={serializeItemsToMarkdown(items)} />
-			<main className={cn(styles.main, "rounded-md bg-white shadow-md p-2")}>
-				{items.map((item) => (
+			<DataStatus currentMarkdownText={serializeMapToMarkdown(map)} />
+			<main
+				className={cn(
+					styles.main,
+					"rounded-md bg-white shadow-md p-2 overflow-auto",
+				)}
+			>
+				{map.children.map((item) => (
 					<ItemFamily
 						key={item.id}
 						item={item}
 						isParentExpanded
 						onChangeDescription={handleChangeDescription}
+						onAddItem={(parentId) => {
+							console.log("add item", parentId);
+						}}
 					/>
 				))}
 			</main>

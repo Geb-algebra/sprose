@@ -1,19 +1,27 @@
 import localforage from "localforage";
 import type { Item } from "../models";
-import { parseMarkdownToItems, serializeItemsToMarkdown } from "../services";
+import { parseMarkdownToMap, serializeMapToMarkdown } from "../services";
+
+export function createEmptyMap(): Item {
+	return {
+		id: "__root",
+		description: "",
+		children: [],
+	};
+}
 
 export class MapRepository {
 	static KEY = "markdownText";
 	static async get() {
 		const markdownText = await localforage.getItem<string>(MapRepository.KEY);
 		if (!markdownText) {
-			return [];
+			return createEmptyMap();
 		}
-		return parseMarkdownToItems(markdownText);
+		return parseMarkdownToMap(markdownText);
 	}
 
-	static async save(map: Item[]) {
-		const markdownText = serializeItemsToMarkdown(map);
+	static async save(map: Item) {
+		const markdownText = serializeMapToMarkdown(map);
 		return await localforage.setItem(MapRepository.KEY, markdownText);
 	}
 

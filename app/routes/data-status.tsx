@@ -10,7 +10,7 @@ import React from "react";
 import { useFetcher } from "react-router";
 import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
 import { MapRepository } from "~/map/lifecycle";
-import { parseMarkdownToItems, serializeItemsToMarkdown } from "~/map/services";
+import { parseMarkdownToMap, serializeMapToMarkdown } from "~/map/services";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/data-status";
 import styles from "./data-status.module.css";
@@ -18,7 +18,7 @@ import { ImportMarkdownButton } from "./import-markdown";
 
 async function getMarkdownText() {
 	const map = await MapRepository.get();
-	const markdownText = serializeItemsToMarkdown(map);
+	const markdownText = serializeMapToMarkdown(map);
 	return { markdownText };
 }
 
@@ -34,7 +34,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 		throw new Error("Invalid markdown text input, expected a string.");
 	}
 	try {
-		await MapRepository.save(parseMarkdownToItems(markdownText));
+		await MapRepository.save(parseMarkdownToMap(markdownText));
 		return await getMarkdownText();
 	} catch (error) {
 		throw new Error(`Failed to save markdown text: ${error}`);

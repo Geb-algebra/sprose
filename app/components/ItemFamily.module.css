@@ -1,20 +1,14 @@
 .layout {
 	display: grid;
-	grid-template-columns: 1fr 32px;
-	grid-template-rows: 32px 1fr;
+	grid-template-columns: 1fr 16px;
+	grid-template-rows: 1fr;
 	gap: 0;
 	width: fit-content;
-	grid-template-areas:
-		"content handle"
-		"content expand";
+	grid-template-areas: "content expand";
 }
 
 .content {
 	grid-area: content;
-}
-
-.handle {
-	grid-area: handle;
 }
 
 .expand {
