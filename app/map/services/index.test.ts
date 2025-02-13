@@ -5,6 +5,7 @@ import {
 	parseMarkdownToMap,
 	serializeMapToMarkdown,
 	updateItemDescription,
+	deleteItem,
 } from "./index";
 
 describe("parseMarkdownToMap", () => {
@@ -297,7 +298,11 @@ describe("addNewItem", () => {
 			],
 		};
 
-		const newMap = addNewItem("__root", map);
+		const newMap = addNewItem("__root", map, {
+			id: "some",
+			description: "Some",
+			children: [],
+		});
 		expect(newMap).toEqual({
 			id: "__root",
 			description: "",
@@ -316,7 +321,7 @@ describe("addNewItem", () => {
 						},
 					],
 				},
-				{ id: expect.any(String), description: "", children: [] },
+				{ id: expect.any(String), description: "Some", children: [] },
 			],
 		});
 	});
@@ -343,7 +348,11 @@ describe("addNewItem", () => {
 			],
 		};
 
-		const newMap = addNewItem("6", map);
+		const newMap = addNewItem("6", map, {
+			id: "some",
+			description: "Some",
+			children: [],
+		});
 		expect(newMap).toEqual({
 			id: "__root",
 			description: "",
@@ -363,12 +372,86 @@ describe("addNewItem", () => {
 									children: [
 										{
 											id: expect.any(String),
-											description: "",
+											description: "Some",
 											children: [],
 										},
 									],
 								},
 							],
+						},
+					],
+				},
+			],
+		});
+	});
+});
+
+describe("addNewItem", () => {
+	it("should delete a root item", () => {
+		const map: Item = {
+			id: "__root",
+			description: "",
+			children: [
+				{
+					id: "1",
+					description: "Item 1",
+					children: [
+						{
+							id: "2",
+							description: "Item 2",
+							children: [
+								{ id: "5", description: "Item 5", children: [] },
+								{ id: "6", description: "Item 6", children: [] },
+							],
+						},
+					],
+				},
+			],
+		};
+
+		const newMap = deleteItem("1", map);
+		expect(newMap).toEqual({
+			id: "__root",
+			description: "",
+			children: [],
+		});
+	});
+
+	it("should delete a child", () => {
+		const map: Item = {
+			id: "__root",
+			description: "",
+			children: [
+				{
+					id: "1",
+					description: "Item 1",
+					children: [
+						{
+							id: "2",
+							description: "Item 2",
+							children: [
+								{ id: "5", description: "Item 5", children: [] },
+								{ id: "6", description: "Item 6", children: [] },
+							],
+						},
+					],
+				},
+			],
+		};
+
+		const newMap = deleteItem("6", map);
+		expect(newMap).toEqual({
+			id: "__root",
+			description: "",
+			children: [
+				{
+					id: "1",
+					description: "Item 1",
+					children: [
+						{
+							id: "2",
+							description: "Item 2",
+							children: [{ id: "5", description: "Item 5", children: [] }],
 						},
 					],
 				},

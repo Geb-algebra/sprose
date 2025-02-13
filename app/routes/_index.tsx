@@ -6,11 +6,13 @@ import ItemFamily from "~/components/ItemFamily";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import {
 	addNewItem,
+	deleteItem,
 	serializeMapToMarkdown,
 	updateItemDescription,
 } from "~/map/services";
 import type { Route } from "./+types/_index";
 import { DataStatus } from "./data-status";
+import type { Item } from "~/map/models";
 
 export async function clientLoader() {
 	console.debug("revalidated index");
@@ -20,7 +22,12 @@ export async function clientLoader() {
 export default function Page({ loaderData: map }: Route.ComponentProps) {
 	const fetcher = useFetcher();
 	const handleChangeDescription = (description: string, itemId: string) => {
-		const newMap = updateItemDescription(map, itemId, description);
+		let newMap: Item;
+		if (description.trim() === "") {
+			newMap = deleteItem(itemId, map);
+		} else {
+			newMap = updateItemDescription(map, itemId, description);
+		}
 		fetcher.submit(
 			{ markdownText: serializeMapToMarkdown(newMap) },
 			{ method: "POST", action: "/data-status" },

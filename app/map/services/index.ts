@@ -78,3 +78,13 @@ export function addNewItem(parentId: string, item: Item, newItem: Item): Item {
 		),
 	};
 }
+
+// delete item from an item tree
+export function deleteItem(itemId: string, item: Item): Item {
+	return {
+		...item,
+		children: item.children
+			.filter((child) => child.id !== itemId)
+			.map((child) => deleteItem(itemId, child)),
+	};
+}

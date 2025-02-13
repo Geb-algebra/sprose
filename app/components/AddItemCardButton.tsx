@@ -14,6 +14,10 @@ export default function AddItemCardButton(props: {
 				props.className,
 			)}
 			onBlur={(e) => {
+				if (e.target.value.trim() === "") {
+					setWriting(false);
+					return;
+				}
 				props.onFinishWriting(e.target.value);
 				setWriting(false);
 			}}
