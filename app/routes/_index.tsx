@@ -4,6 +4,7 @@ import styles from "./_index.module.css";
 import { useFetcher } from "react-router";
 import ItemFamily from "~/components/ItemFamily";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
+import type { Item } from "~/map/models";
 import {
 	addNewItem,
 	deleteItem,
@@ -12,7 +13,6 @@ import {
 } from "~/map/services";
 import type { Route } from "./+types/_index";
 import { DataStatus } from "./data-status";
-import type { Item } from "~/map/models";
 
 export async function clientLoader() {
 	console.debug("revalidated index");
@@ -28,18 +28,20 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 		} else {
 			newMap = updateItemDescription(map, itemId, description);
 		}
-		fetcher.submit(
-			{ markdownText: serializeMapToMarkdown(newMap) },
-			{ method: "POST", action: "/data-status" },
-		);
+		fetcher.submit(newMap, {
+			method: "POST",
+			action: "/data-status",
+			encType: "application/json",
+		});
 	};
 	const handleAddItem = async (parentId: string, description: string) => {
 		const newItem = createNewItem(description);
 		const newMap = addNewItem(parentId, map, newItem);
-		await fetcher.submit(
-			{ markdownText: serializeMapToMarkdown(newMap) },
-			{ method: "POST", action: "/data-status" },
-		);
+		await fetcher.submit(newMap, {
+			method: "POST",
+			action: "/data-status",
+			encType: "application/json",
+		});
 		document.getElementById(newItem.id)?.focus();
 	};
 
@@ -48,7 +50,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 			<h1 className={cn(styles.title, "text-2xl text-slate-400 px-2")}>
 				User Story Mapper
 			</h1>
-			<DataStatus currentMarkdownText={serializeMapToMarkdown(map)} />
+			<DataStatus currentItem={map} />
 			<main
 				className={cn(
 					styles.main,

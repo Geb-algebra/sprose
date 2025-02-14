@@ -10,53 +10,50 @@ import React from "react";
 import { useFetcher } from "react-router";
 import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
 import { MapRepository } from "~/map/lifecycle";
-import { parseMarkdownToMap, serializeMapToMarkdown } from "~/map/services";
+import type { Item } from "~/map/models";
+import {
+	isItem,
+	parseMarkdownToMap,
+	serializeMapToMarkdown,
+} from "~/map/services";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/data-status";
 import styles from "./data-status.module.css";
 import { ImportMarkdownButton } from "./import-markdown";
 
-async function getMarkdownText() {
-	const map = await MapRepository.get();
-	const markdownText = serializeMapToMarkdown(map);
-	return { markdownText };
-}
-
 export async function clientLoader() {
-	return await getMarkdownText();
+	return await MapRepository.get();
 }
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	// await new Promise((resolve) => setTimeout(resolve, 500));
-	const formData = await request.formData();
-	const markdownText = formData.get("markdownText");
-	if (!(typeof markdownText === "string")) {
-		throw new Error("Invalid markdown text input, expected a string.");
+	const item = await request.json();
+	if (!isItem(item)) {
+		throw new Error("Invalid item");
 	}
-	try {
-		await MapRepository.save(parseMarkdownToMap(markdownText));
-		return await getMarkdownText();
-	} catch (error) {
-		throw new Error(`Failed to save markdown text: ${error}`);
-	}
+	return await MapRepository.save(item);
 }
 
-export function DataStatus(props: { currentMarkdownText: string }) {
+export function DataStatus(props: { currentItem: Item }) {
 	const fetcher = useFetcher<typeof clientLoader>();
-	const savedMarkdownText = fetcher.data?.markdownText;
-	const isInSync = props.currentMarkdownText === savedMarkdownText;
+	const savedItem = fetcher.data;
 	console.log("data", fetcher.data);
+	const isInSync =
+		JSON.stringify(savedItem) === JSON.stringify(props.currentItem);
+
 	React.useEffect(() => {
 		const timeoutId = setTimeout(() => {
 			if (!isInSync) {
-				const formData = new FormData();
-				formData.append("markdownText", props.currentMarkdownText);
-				fetcher.submit(formData, { method: "post", action: "/data-status" });
+				fetcher.submit(props.currentItem, {
+					method: "post",
+					action: "/data-status",
+					encType: "application/json",
+				});
 			}
 		}, 2000);
 
 		return () => clearTimeout(timeoutId);
-	}, [isInSync, props.currentMarkdownText, fetcher]);
+	}, [isInSync, props.currentItem, fetcher]);
 	return (
 		<div className={cn(styles.layout, "-mb-5 z-1")}>
 			<ImportMarkdownButton className={styles.import} />

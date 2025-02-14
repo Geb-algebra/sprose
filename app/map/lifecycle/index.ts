@@ -11,18 +11,17 @@ export function createEmptyMap(): Item {
 }
 
 export class MapRepository {
-	static KEY = "markdownText";
+	static KEY = "map";
 	static async get() {
-		const markdownText = await localforage.getItem<string>(MapRepository.KEY);
-		if (!markdownText) {
+		const item = await localforage.getItem<Item>(MapRepository.KEY);
+		if (!item) {
 			return createEmptyMap();
 		}
-		return parseMarkdownToMap(markdownText);
+		return item;
 	}
 
 	static async save(map: Item) {
-		const markdownText = serializeMapToMarkdown(map);
-		return await localforage.setItem(MapRepository.KEY, markdownText);
+		return await localforage.setItem(MapRepository.KEY, map);
 	}
 
 	static async delete() {
@@ -36,4 +35,32 @@ function generateId(): string {
 
 export function createNewItem(description: string): Item {
 	return { id: generateId(), description, children: [] };
+}
+
+export class ExpandStatusRepository {
+	static KEY = "expand-status";
+
+	static async get() {
+		return await localforage.getItem<string[]>(ExpandStatusRepository.KEY);
+	}
+
+	static async isExpanded(itemId: string) {
+		const expandedItems = await ExpandStatusRepository.get();
+		return expandedItems?.includes(itemId) || false;
+	}
+
+	static async toggle(itemId: string) {
+		const expandedItems = (await ExpandStatusRepository.get()) || [];
+		const newExpandedItems = expandedItems.includes(itemId)
+			? expandedItems.filter((id) => id !== itemId)
+			: [...expandedItems, itemId];
+		return await localforage.setItem(
+			ExpandStatusRepository.KEY,
+			newExpandedItems,
+		);
+	}
+
+	static async clear() {
+		return await localforage.setItem(ExpandStatusRepository.KEY, []);
+	}
 }

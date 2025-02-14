@@ -3,6 +3,8 @@ import type { Item } from "~/map/models";
 import ItemCard from "./ItemCard";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import React from "react";
+import { ExpandStatusRepository } from "~/map/lifecycle";
 import { cn } from "~/utils/css";
 import AddItemCardButton from "./AddItemCardButton";
 import { Button } from "./Button";
@@ -16,6 +18,11 @@ export default function ItemFamily(props: {
 	className?: string;
 }) {
 	const [isExpanded, setIsExpanded] = useState(false);
+	React.useEffect(() => {
+		ExpandStatusRepository.isExpanded(props.item.id).then((isExpanded) => {
+			setIsExpanded(isExpanded);
+		});
+	}, [props.item.id]);
 	if (!props.isParentExpanded) {
 		return (
 			<ItemCard
@@ -66,7 +73,10 @@ export default function ItemFamily(props: {
 				variant="ghost"
 				size="icon"
 				className={cn(styles.expand, "w-4 h-20 ml-auto hover:bg-slate-300")}
-				onClick={() => setIsExpanded(!isExpanded)}
+				onClick={() => {
+					setIsExpanded(!isExpanded);
+					ExpandStatusRepository.toggle(props.item.id);
+				}}
 			>
 				{isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 			</Button>

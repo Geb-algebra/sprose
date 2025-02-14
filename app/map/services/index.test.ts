@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import type { Item } from "~/map/models";
 import {
 	addNewItem,
+	deleteItem,
 	parseMarkdownToMap,
 	serializeMapToMarkdown,
 	updateItemDescription,
-	deleteItem,
 } from "./index";
 
 describe("parseMarkdownToMap", () => {

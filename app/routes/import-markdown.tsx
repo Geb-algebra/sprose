@@ -35,7 +35,11 @@ export function ImportMarkdownButton(props: { className?: string }) {
 					if (e.currentTarget.files && e.currentTarget.files.length > 0) {
 						fetcher.submit(
 							new FormData(e.currentTarget.form as HTMLFormElement),
-							{ method: "post", encType: "multipart/form-data" },
+							{
+								method: "post",
+								encType: "multipart/form-data",
+								action: "/import-markdown",
+							},
 						);
 					}
 				}}
