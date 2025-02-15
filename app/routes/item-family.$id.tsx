@@ -47,13 +47,17 @@ export function ItemFamily(props: {
 	const fetcher = useFetcher();
 	if (!props.isParentExpanded) {
 		return (
-			<ItemCard item={props.item} isStacked={props.item.children.length > 0} />
+			<ItemCard
+				asParent={false}
+				item={props.item}
+				isStacked={props.item.children.length > 0}
+			/>
 		);
 	}
 	return (
 		<div
 			className={cn(
-				"bg-white rounded-sm border border-slate-200 mr-2 mb-2",
+				"bg-slate-50 rounded-sm shadow-sm border border-slate-100 mr-2 mb-2",
 				styles.layout,
 				props.className,
 			)}
@@ -66,7 +70,7 @@ export function ItemFamily(props: {
 					styles.content,
 				)}
 			>
-				<ItemCard item={props.item} isStacked={false} />
+				<ItemCard asParent item={props.item} isStacked={false} />
 				{props.item.children.map((child) => (
 					<ItemFamily
 						key={child.id}
