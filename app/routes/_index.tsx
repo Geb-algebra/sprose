@@ -6,6 +6,7 @@ import { MapRepository, createNewItem } from "~/map/lifecycle";
 import { addNewItem } from "~/map/services";
 import { ItemFamily } from "~/routes/item-family.$id";
 import type { Route } from "./+types/_index";
+import { AddItemCardButton } from "./add-item.$parentId";
 import { DataStatus } from "./data-status";
 
 export async function clientLoader() {
@@ -36,12 +37,14 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 			<main
 				className={cn(
 					styles.main,
+					styles.mainLayout,
 					"rounded-md bg-white shadow-md p-2 overflow-auto",
 				)}
 			>
-				{map.children.map((item) => (
-					<ItemFamily key={item.id} item={item} isParentExpanded />
+				{map.children.map((item, siblingIndex) => (
+					<ItemFamily key={item.id} parent={map} siblingIndex={siblingIndex} />
 				))}
+				<AddItemCardButton parent={map} />
 			</main>
 		</div>
 	);

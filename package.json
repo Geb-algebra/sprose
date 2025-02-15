@@ -8,8 +8,9 @@
 		"check:write": "biome check --write",
 		"check:write-unsafe": "biome check --write --unsafe",
 		"test:unit": "vitest --ui",
+		"test:unit:run": "vitest run",
 		"typecheck": "react-router typegen && tsc",
-		"validate": "npm run check && npm run typecheck",
+		"validate": "npm run check && npm run typecheck && npm run test:unit:run",
 		"deploy": "wrangler deploy",
 		"dev": "react-router dev",
 		"start": "wrangler dev"

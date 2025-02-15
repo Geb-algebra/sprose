@@ -65,16 +65,46 @@ export function updateItem(
  * Adds a new item as a child of the item with the given ID.
  * if no ID is provided, the item is added as a root item.
  */
-export function addNewItem(parentId: string, item: Item, newItem: Item): Item {
-	if (parentId === item.id) {
-		return { ...item, children: [...item.children, newItem] };
+export function addNewItem(
+	parentId: string,
+	map: Item,
+	newItem: Item,
+	at = 10000000000000,
+): Item {
+	if (parentId === map.id) {
+		return {
+			...map,
+			children: [
+				...map.children.slice(0, at),
+				newItem,
+				...map.children.slice(at, 10000000000000),
+			],
+		};
 	}
 	return {
-		...item,
-		children: item.children.map((child) =>
-			addNewItem(parentId, child, newItem),
+		...map,
+		children: map.children.map((child) =>
+			addNewItem(parentId, child, newItem, at),
 		),
 	};
+}
+
+export function moveItem(
+	movedItemId: string,
+	targetParentId: string,
+	targetSiblingIndex: number,
+	map: Item,
+) {
+	const movedItem = findChildById(map, movedItemId);
+	if (!movedItem) {
+		return map;
+	}
+	const newMap = deleteItem(movedItemId, map);
+	const targetParent = findChildById(newMap, targetParentId);
+	if (!targetParent) {
+		return map;
+	}
+	return addNewItem(targetParent.id, newMap, movedItem, targetSiblingIndex);
 }
 
 // delete item from an item tree
@@ -103,15 +133,25 @@ export function isItem(item: Item): item is Item {
 	return item.children.every(isItem);
 }
 
-export async function findChildById(
-	item: Item,
-	id: string,
-): Promise<Item | null> {
+export function findChildById(item: Item, id: string): Item | null {
 	if (item.id === id) {
 		return item;
 	}
 	for (const child of item.children) {
-		const found = await findChildById(child, id);
+		const found = findChildById(child, id);
+		if (found) {
+			return found;
+		}
+	}
+	return null;
+}
+
+export function findParentByChildId(item: Item, id: string): Item | null {
+	for (const child of item.children) {
+		if (child.id === id) {
+			return item;
+		}
+		const found = findParentByChildId(child, id);
 		if (found) {
 			return found;
 		}

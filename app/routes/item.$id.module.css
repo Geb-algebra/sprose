@@ -1,21 +1,22 @@
 .layout {
 	display: grid;
-	grid-template-columns: 1fr 32px;
-	grid-template-rows: 1fr 32px;
+	grid-template-columns: 1fr;
+	grid-template-rows: auto auto auto;
 	gap: 0;
 	grid-template-areas:
-		"content handle"
-		"content .";
+		"insert-top"
+		"content"
+		"insert-bottom";
 }
 
 .content {
 	grid-area: content;
 }
 
-.handle {
-	grid-area: handle;
+.insertTop {
+	grid-area: insert-top;
 }
 
-.expand {
-	grid-area: expand;
+.insertBottom {
+	grid-area: insert-bottom;
 }

@@ -1,0 +1,17 @@
+.layout {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: auto auto;
+	gap: 0;
+	grid-template-areas:
+		"insert"
+		"content";
+}
+
+.content {
+	grid-area: content;
+}
+
+.insert {
+	grid-area: insert;
+}
