@@ -5,7 +5,7 @@ import {
 	deleteItem,
 	parseMarkdownToMap,
 	serializeMapToMarkdown,
-	updateItemDescription,
+	updateItem,
 } from "./index";
 
 describe("parseMarkdownToMap", () => {
@@ -23,25 +23,49 @@ describe("parseMarkdownToMap", () => {
 		const expected: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: expect.any(String),
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: expect.any(String),
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: expect.any(String), description: "Item 5", children: [] },
-								{ id: expect.any(String), description: "Item 6", children: [] },
+								{
+									id: expect.any(String),
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: expect.any(String),
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
-						{ id: expect.any(String), description: "Item 3", children: [] },
+						{
+							id: expect.any(String),
+							description: "Item 3",
+							isExpanded: false,
+							children: [],
+						},
 						{
 							id: expect.any(String),
 							description: "Item 4",
+							isExpanded: false,
 							children: [
-								{ id: expect.any(String), description: "Item 7", children: [] },
+								{
+									id: expect.any(String),
+									description: "Item 7",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
 					],
@@ -59,6 +83,7 @@ describe("parseMarkdownToMap", () => {
 		expect(result).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [],
 		});
 	});
@@ -74,20 +99,38 @@ describe("parseMarkdownToMap", () => {
 		const expected: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: expect.any(String),
 					description: "Item 1",
+					isExpanded: false,
 					children: [
-						{ id: expect.any(String), description: "Item 2", children: [] },
+						{
+							id: expect.any(String),
+							description: "Item 2",
+							isExpanded: false,
+							children: [],
+						},
 					],
 				},
 				{
 					id: expect.any(String),
 					description: "Item 3",
+					isExpanded: false,
 					children: [
-						{ id: expect.any(String), description: "Item 4", children: [] },
-						{ id: expect.any(String), description: "Item 5", children: [] },
+						{
+							id: expect.any(String),
+							description: "Item 4",
+							isExpanded: false,
+							children: [],
+						},
+						{
+							id: expect.any(String),
+							description: "Item 5",
+							isExpanded: false,
+							children: [],
+						},
 					],
 				},
 			],
@@ -102,24 +145,45 @@ describe("serializeMapToMarkdown", () => {
 		const items: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
-						{ id: "3", description: "Item 3", children: [] },
+						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
 						{
 							id: "4",
 							description: "Item 4",
-							children: [{ id: "7", description: "Item 7", children: [] }],
+							isExpanded: false,
+							children: [
+								{
+									id: "7",
+									description: "Item 7",
+									isExpanded: false,
+									children: [],
+								},
+							],
 						},
 					],
 				},
@@ -142,6 +206,7 @@ describe("serializeMapToMarkdown", () => {
 		const map: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [],
 		};
 		const result = serializeMapToMarkdown(map);
@@ -154,52 +219,97 @@ describe("updateItemDescription", () => {
 		const items: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
-						{ id: "3", description: "Item 3", children: [] },
+						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
 						{
 							id: "4",
 							description: "Item 4",
-							children: [{ id: "7", description: "Item 7", children: [] }],
+							isExpanded: false,
+							children: [
+								{
+									id: "7",
+									description: "Item 7",
+									isExpanded: false,
+									children: [],
+								},
+							],
 						},
 					],
 				},
 			],
 		};
 
-		const updatedItems = updateItemDescription(items, "1", "Updated Item 1");
+		const updatedItems = updateItem(items, {
+			id: "1",
+			description: "Updated Item 1",
+		});
 		expect(updatedItems).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Updated Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
-						{ id: "3", description: "Item 3", children: [] },
+						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
 						{
 							id: "4",
 							description: "Item 4",
-							children: [{ id: "7", description: "Item 7", children: [] }],
+							isExpanded: false,
+							children: [
+								{
+									id: "7",
+									description: "Item 7",
+									isExpanded: false,
+									children: [],
+								},
+							],
 						},
 					],
 				},
@@ -211,62 +321,111 @@ describe("updateItemDescription", () => {
 		const map: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
 								{
 									id: "6",
 									description: "Item 6",
-									children: [{ id: "8", description: "Item 8", children: [] }],
+									isExpanded: false,
+									children: [
+										{
+											id: "8",
+											description: "Item 8",
+											isExpanded: false,
+											children: [],
+										},
+									],
 								},
 							],
 						},
-						{ id: "3", description: "Item 3", children: [] },
+						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
 						{
 							id: "4",
 							description: "Item 4",
-							children: [{ id: "7", description: "Item 7", children: [] }],
+							isExpanded: false,
+							children: [
+								{
+									id: "7",
+									description: "Item 7",
+									isExpanded: false,
+									children: [],
+								},
+							],
 						},
 					],
 				},
 			],
 		};
 
-		const updatedItems = updateItemDescription(map, "8", "Updated Item 8");
+		const updatedItems = updateItem(map, {
+			id: "8",
+			description: "Updated Item 8",
+		});
 		expect(updatedItems).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
 								{
 									id: "6",
 									description: "Item 6",
+									isExpanded: false,
 									children: [
-										{ id: "8", description: "Updated Item 8", children: [] },
+										{
+											id: "8",
+											description: "Updated Item 8",
+											isExpanded: false,
+											children: [],
+										},
 									],
 								},
 							],
 						},
-						{ id: "3", description: "Item 3", children: [] },
+						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
 						{
 							id: "4",
 							description: "Item 4",
-							children: [{ id: "7", description: "Item 7", children: [] }],
+							isExpanded: false,
+							children: [
+								{
+									id: "7",
+									description: "Item 7",
+									isExpanded: false,
+									children: [],
+								},
+							],
 						},
 					],
 				},
@@ -280,17 +439,30 @@ describe("addNewItem", () => {
 		const map: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
 					],
@@ -301,27 +473,46 @@ describe("addNewItem", () => {
 		const newMap = addNewItem("__root", map, {
 			id: "some",
 			description: "Some",
+			isExpanded: false,
 			children: [],
 		});
 		expect(newMap).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
 					],
 				},
-				{ id: expect.any(String), description: "Some", children: [] },
+				{
+					id: expect.any(String),
+					description: "Some",
+					isExpanded: false,
+					children: [],
+				},
 			],
 		});
 	});
@@ -330,17 +521,30 @@ describe("addNewItem", () => {
 		const map: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
 					],
@@ -351,28 +555,39 @@ describe("addNewItem", () => {
 		const newMap = addNewItem("6", map, {
 			id: "some",
 			description: "Some",
+			isExpanded: false,
 			children: [],
 		});
 		expect(newMap).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
 								{
 									id: "6",
 									description: "Item 6",
+									isExpanded: false,
 									children: [
 										{
 											id: expect.any(String),
 											description: "Some",
+											isExpanded: false,
 											children: [],
 										},
 									],
@@ -391,17 +606,30 @@ describe("addNewItem", () => {
 		const map: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
 					],
@@ -413,6 +641,7 @@ describe("addNewItem", () => {
 		expect(newMap).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [],
 		});
 	});
@@ -421,17 +650,30 @@ describe("addNewItem", () => {
 		const map: Item = {
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
+							isExpanded: false,
 							children: [
-								{ id: "5", description: "Item 5", children: [] },
-								{ id: "6", description: "Item 6", children: [] },
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+								{
+									id: "6",
+									description: "Item 6",
+									isExpanded: false,
+									children: [],
+								},
 							],
 						},
 					],
@@ -443,15 +685,25 @@ describe("addNewItem", () => {
 		expect(newMap).toEqual({
 			id: "__root",
 			description: "",
+			isExpanded: false,
 			children: [
 				{
 					id: "1",
 					description: "Item 1",
+					isExpanded: false,
 					children: [
 						{
 							id: "2",
 							description: "Item 2",
-							children: [{ id: "5", description: "Item 5", children: [] }],
+							isExpanded: false,
+							children: [
+								{
+									id: "5",
+									description: "Item 5",
+									isExpanded: false,
+									children: [],
+								},
+							],
 						},
 					],
 				},

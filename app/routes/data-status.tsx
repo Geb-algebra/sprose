@@ -1,4 +1,3 @@
-import * as localforage from "localforage";
 import {
 	ArrowRightIcon,
 	ArrowUpDownIcon,
@@ -11,11 +10,7 @@ import { useFetcher } from "react-router";
 import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import {
-	isItem,
-	parseMarkdownToMap,
-	serializeMapToMarkdown,
-} from "~/map/services";
+import { isItem } from "~/map/services";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/data-status";
 import styles from "./data-status.module.css";
@@ -37,7 +32,6 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 export function DataStatus(props: { currentItem: Item }) {
 	const fetcher = useFetcher<typeof clientLoader>();
 	const savedItem = fetcher.data;
-	console.log("data", fetcher.data);
 	const isInSync =
 		JSON.stringify(savedItem) === JSON.stringify(props.currentItem);
 

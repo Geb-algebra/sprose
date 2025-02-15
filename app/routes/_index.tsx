@@ -2,15 +2,9 @@ import { cn } from "~/utils/css";
 import styles from "./_index.module.css";
 
 import { useFetcher } from "react-router";
-import ItemFamily from "~/components/ItemFamily";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
-import type { Item } from "~/map/models";
-import {
-	addNewItem,
-	deleteItem,
-	serializeMapToMarkdown,
-	updateItemDescription,
-} from "~/map/services";
+import { addNewItem } from "~/map/services";
+import { ItemFamily } from "~/routes/item-family.$id";
 import type { Route } from "./+types/_index";
 import { DataStatus } from "./data-status";
 
@@ -20,20 +14,8 @@ export async function clientLoader() {
 }
 
 export default function Page({ loaderData: map }: Route.ComponentProps) {
+	console.log(map);
 	const fetcher = useFetcher();
-	const handleChangeDescription = (description: string, itemId: string) => {
-		let newMap: Item;
-		if (description.trim() === "") {
-			newMap = deleteItem(itemId, map);
-		} else {
-			newMap = updateItemDescription(map, itemId, description);
-		}
-		fetcher.submit(newMap, {
-			method: "POST",
-			action: "/data-status",
-			encType: "application/json",
-		});
-	};
 	const handleAddItem = async (parentId: string, description: string) => {
 		const newItem = createNewItem(description);
 		const newMap = addNewItem(parentId, map, newItem);
@@ -58,13 +40,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 				)}
 			>
 				{map.children.map((item) => (
-					<ItemFamily
-						key={item.id}
-						item={item}
-						isParentExpanded
-						onChangeDescription={handleChangeDescription}
-						onFinishWritingNewItem={handleAddItem}
-					/>
+					<ItemFamily key={item.id} item={item} isParentExpanded />
 				))}
 			</main>
 		</div>

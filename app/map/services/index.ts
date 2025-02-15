@@ -27,6 +27,7 @@ export function parseMarkdownToMap(markdown: string): Item {
 	return {
 		id: "__root",
 		description: "",
+		isExpanded: true,
 		children: rootItems,
 	} as Item;
 }
@@ -47,19 +48,16 @@ export function serializeMapToMarkdown(map: Item): string {
 		.join("\n");
 }
 
-export function updateItemDescription(
+export function updateItem(
 	items: Item,
-	itemId: string,
-	newDescription: string,
+	newItem: { id: string } & Partial<Item>,
 ): Item {
-	if (items.id === itemId) {
-		return { ...items, description: newDescription };
+	if (items.id === newItem.id) {
+		return { ...items, ...newItem };
 	}
 	return {
 		...items,
-		children: items.children.map((child) =>
-			updateItemDescription(child, itemId, newDescription),
-		),
+		children: items.children.map((child) => updateItem(child, newItem)),
 	};
 }
 
@@ -96,8 +94,27 @@ export function isItem(item: Item): item is Item {
 	if (typeof item.description !== "string") {
 		return false;
 	}
+	if (typeof item.isExpanded !== "boolean") {
+		return false;
+	}
 	if (!Array.isArray(item.children)) {
 		return false;
 	}
 	return item.children.every(isItem);
+}
+
+export async function findChildById(
+	item: Item,
+	id: string,
+): Promise<Item | null> {
+	if (item.id === id) {
+		return item;
+	}
+	for (const child of item.children) {
+		const found = await findChildById(child, id);
+		if (found) {
+			return found;
+		}
+	}
+	return null;
 }
