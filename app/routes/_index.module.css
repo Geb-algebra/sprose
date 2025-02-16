@@ -3,11 +3,11 @@
 	height: 100vh;
 	padding: 8px;
 	display: grid;
-	grid-template-columns: minmax(256px, auto) 160px 1fr;
-	grid-template-rows: 40px 1fr;
+	grid-template-columns: 1fr 160px 1fr;
+	grid-template-rows: auto 1fr;
 	gap: 8px;
 	grid-template-areas:
-		"title data-status ."
+		"title control ."
 		"main main main";
 }
 
@@ -23,6 +23,10 @@
 	grid-area: export;
 }
 
+.control {
+	grid-area: control;
+}
+
 .main {
 	grid-area: main;
 }
@@ -31,5 +35,6 @@
 	display: grid;
 	gap: 0px;
 	justify-items: start;
+	justify-content: start;
 	grid-auto-flow: column;
 }

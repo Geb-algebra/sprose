@@ -6,7 +6,7 @@ import { MapRepository } from "~/map/lifecycle";
 import { ItemFamily } from "~/routes/item-family.$id";
 import type { Route } from "./+types/_index";
 import { AddItemCardButton } from "./add-item.$parentId";
-import { DataStatus } from "./data-status";
+import { Control } from "./control";
 
 export async function clientLoader() {
 	console.debug("revalidated index");
@@ -18,10 +18,15 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 
 	return (
 		<div className={cn(styles.bodyLayout, "bg-slate-200")}>
-			<h1 className={cn(styles.title, "text-2xl text-slate-400 px-2")}>
+			<h1
+				className={cn(
+					styles.title,
+					"text-2xl text-slate-400 px-2 grid items-center",
+				)}
+			>
 				Exporg
 			</h1>
-			<DataStatus currentItem={map} />
+			<Control className={styles.control} />
 			<main
 				className={cn(
 					styles.main,

@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import type { Item } from "../models";
+import type { Item, MapData } from "../models";
 
 export function createEmptyMap(): Item {
 	return {
@@ -13,15 +13,61 @@ export function createEmptyMap(): Item {
 export class MapRepository {
 	static KEY = "map";
 	static async get() {
-		const item = await localforage.getItem<Item>(MapRepository.KEY);
-		if (!item) {
+		const mapData = await localforage.getItem<MapData>(MapRepository.KEY);
+		if (!mapData) {
 			return createEmptyMap();
 		}
-		return item;
+		return mapData.mapHistory[mapData.currentMapIndex];
 	}
 
 	static async save(map: Item) {
-		return await localforage.setItem(MapRepository.KEY, map);
+		const mapData = await localforage.getItem<MapData>(MapRepository.KEY);
+		if (!mapData) {
+			return await localforage.setItem(MapRepository.KEY, {
+				mapHistory: [map],
+				currentMapIndex: 0,
+			});
+		}
+		// history is ordered from newest to oldest
+		mapData.mapHistory = [
+			map,
+			...mapData.mapHistory.slice(
+				mapData.currentMapIndex,
+				mapData.mapHistory.length,
+			),
+		];
+		if (mapData.mapHistory.length > 100) {
+			mapData.mapHistory.pop();
+		}
+		mapData.currentMapIndex = 0;
+
+		return await localforage.setItem(MapRepository.KEY, mapData);
+	}
+
+	static async undo() {
+		const mapData = await localforage.getItem<MapData>(MapRepository.KEY);
+		if (!mapData) {
+			return;
+		}
+		if (mapData.currentMapIndex === mapData.mapHistory.length - 1) {
+			return;
+		}
+		mapData.currentMapIndex++;
+		await localforage.setItem(MapRepository.KEY, mapData);
+		return;
+	}
+
+	static async redo() {
+		const mapData = await localforage.getItem<MapData>(MapRepository.KEY);
+		if (!mapData) {
+			return;
+		}
+		if (mapData.currentMapIndex === 0) {
+			return;
+		}
+		mapData.currentMapIndex--;
+		await localforage.setItem(MapRepository.KEY, mapData);
+		return;
 	}
 
 	static async delete() {

@@ -68,9 +68,6 @@ export function ItemFamily(props: {
 					default:
 						midpoint = rect.left + rect.width / 2;
 				}
-				console.log("midpoint", midpoint);
-				console.log("clientX", clientX);
-				console.log("rect", rect.left, rect.width);
 				return clientX <= midpoint ? "before" : "after";
 			}
 			switch (insertAt) {

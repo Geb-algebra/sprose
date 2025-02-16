@@ -1,13 +1,13 @@
 import React from "react";
 import { useFetcher } from "react-router";
 import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
+import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { deleteItem, isItem, updateItem } from "~/map/services";
+import { deleteItem, findChildById, isItem, updateItem } from "~/map/services";
 import { cn, focusVisibleStyle } from "~/utils/css";
 import type { Route } from "./+types/item.$id";
 import styles from "./item.$id.module.css";
-import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 
 export async function clientAction({
 	request,
@@ -20,6 +20,13 @@ export async function clientAction({
 		throw new Error("Invalid description");
 	}
 	const map = await MapRepository.get();
+	const currentItem = findChildById(map, id);
+	if (!currentItem || !isItem(currentItem)) {
+		throw new Error("Invalid item");
+	}
+	if (currentItem.description === newDescription) {
+		return null;
+	}
 
 	let newMap: Item;
 	if (newDescription.trim() === "") {
