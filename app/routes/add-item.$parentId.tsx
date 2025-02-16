@@ -1,5 +1,6 @@
 import React from "react";
 import { useFetcher } from "react-router";
+import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { addNewItem, isItem } from "~/map/services";
@@ -28,47 +29,28 @@ export function AddItemCardButton(props: {
 	parent: Item;
 	className?: string;
 }) {
-	console.debug("props.parent");
-	console.debug(props.parent);
 	const [writing, setWriting] = React.useState(false);
-	const [acceptDrop, setAcceptDrop] = React.useState(false);
 	const fetcher = useFetcher();
+	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
+		props.parent,
+		props.parent.children.length,
+		() => "before",
+	);
 	return (
 		<div
 			className={cn(props.className, styles.layout)}
-			onDragOver={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				setAcceptDrop(true);
-			}}
-			onDragLeave={(e) => {
-				setAcceptDrop(false);
-			}}
-			onDrop={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const data = e.dataTransfer.getData("application/item-card");
-				const item = JSON.parse(data);
-				if (!isItem(item)) {
-					throw new Error("Invalid item");
-				}
-				fetcher.submit(
-					{
-						movedItemId: item.id,
-						targetParentId: props.parent.id,
-						targetSiblingIndex: props.parent.children.length,
-					},
-					{ method: "post", action: "/move-item" },
-				);
-				setAcceptDrop(false);
-			}}
+			onDragOver={onDragOver}
+			onDragLeave={onDragLeave}
+			onDrop={onDrop}
 		>
 			<div
 				className={cn(
-					"w-48 h-16 bg-transparent rounded-md mr-2 mb-2 border-2 border-dashed border-slate-100",
-					acceptDrop ? styles.insert : "hidden",
+					"pb-2 pr-2 w-full h-8",
+					insertAt === "before" ? styles.insert : "hidden",
 				)}
-			/>
+			>
+				<div className={cn("bg-slate-300 w-full h-full rounded-md")} />
+			</div>
 			{writing ? (
 				<textarea
 					className={cn(

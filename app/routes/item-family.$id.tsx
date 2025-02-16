@@ -1,10 +1,13 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import React from "react";
-import { useFetcher, useSubmit } from "react-router";
+import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
+import {
+	useAcceptCardInsert,
+	useStartCardInsert,
+} from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { addNewItem, isItem, updateItem } from "~/map/services";
+import { addNewItem, updateItem } from "~/map/services";
 import { AddItemCardButton } from "~/routes/add-item.$parentId";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/item-family.$id";
@@ -45,126 +48,129 @@ export function ItemFamily(props: {
 	siblingIndex: number;
 	className?: string;
 }) {
-	console.debug("itemparent", props.parent);
 	const item = props.parent.children[props.siblingIndex];
-	console.debug("child", item);
 	const fetcher = useFetcher();
-	const [acceptDrop, setAcceptDrop] = React.useState<"none" | "left" | "right">(
-		"none",
-	);
-	if (!props.parent.isExpanded) {
-		return (
-			<ItemCard
-				asParent={false}
-				parent={props.parent}
-				siblingIndex={props.siblingIndex}
-				isStacked={item.children.length > 0}
-			/>
-		);
-	}
-	return (
-		<div
-			className={cn(styles.layout, props.className)}
-			onDragOver={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const rect = e.currentTarget.getBoundingClientRect();
-				let midpoint: number;
-				switch (acceptDrop) {
-					case "left":
-						midpoint = rect.left + (rect.width / 4) * 3;
+	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
+	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
+		props.parent,
+		props.siblingIndex,
+		(params) => {
+			const { rect, clientX, clientY, insertAt } = params;
+			let midpoint: number;
+			if (props.parent.isExpanded) {
+				switch (insertAt) {
+					case "before":
+						midpoint = rect.left + (rect.width - 32) / 2 + 32;
 						break;
-					case "right":
-						midpoint = rect.left + rect.width / 4;
+					case "after":
+						midpoint = rect.left + (rect.width - 32) / 2 + 32;
 						break;
 					default:
 						midpoint = rect.left + rect.width / 2;
 				}
-				setAcceptDrop(e.clientX <= midpoint ? "left" : "right");
-			}}
-			onDragLeave={() => {
-				setAcceptDrop("none");
-			}}
-			onDrop={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const data = e.dataTransfer.getData("application/item-card");
-				const item = JSON.parse(data);
-				if (!isItem(item)) {
-					throw new Error("Invalid item");
-				}
-				fetcher.submit(
-					{
-						movedItemId: item.id,
-						targetParentId: props.parent.id,
-						targetSiblingIndex:
-							acceptDrop === "left"
-								? props.siblingIndex
-								: props.siblingIndex + 1,
-					},
-					{ method: "post", action: "/move-item" },
-				);
-				setAcceptDrop("none");
-			}}
+				console.log("midpoint", midpoint);
+				console.log("clientX", clientX);
+				console.log("rect", rect.left, rect.width);
+				return clientX <= midpoint ? "before" : "after";
+			}
+			switch (insertAt) {
+				case "before":
+					midpoint = rect.top + (rect.height / 4) * 3;
+					break;
+				case "after":
+					midpoint = rect.top + rect.height / 4;
+					break;
+				default:
+					midpoint = rect.top + rect.height / 2;
+			}
+			return clientY <= midpoint ? "before" : "after";
+		},
+	);
+
+	return (
+		<div
+			className={cn(styles.layout, props.className)}
+			onDragOver={onDragOver}
+			onDragLeave={onDragLeave}
+			onDrop={onDrop}
 		>
-			<div
-				className={cn(
-					"bg-slate-50 rounded-sm shadow-sm border border-slate-100 mr-2 mb-2",
-					styles.family,
-					styles.familyLayout,
-				)}
-			>
+			{!props.parent.isExpanded ? (
+				<ItemCard
+					asParent={false}
+					parent={props.parent}
+					siblingIndex={props.siblingIndex}
+					className={styles.family}
+				/>
+			) : (
 				<div
 					className={cn(
-						item.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
-						styles.content,
+						"bg-slate-50 rounded-sm shadow-sm border border-slate-100 mr-2 mb-2",
+						styles.family,
+						styles.familyLayout,
 					)}
+					draggable
+					onDragStart={onDragStart}
 				>
-					<ItemCard
-						asParent
-						parent={props.parent}
-						siblingIndex={props.siblingIndex}
-						isStacked={false}
-					/>
-					{item.children.map((child, siblingIndex) => (
-						<ItemFamily
-							key={child.id}
+					<div
+						className={cn(
+							item.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
+							styles.content,
+						)}
+					>
+						<ItemCard
+							asParent
+							parent={props.parent}
+							siblingIndex={props.siblingIndex}
+						/>
+						{item.children.map((child, siblingIndex) => (
+							<ItemFamily
+								key={child.id}
+								parent={item}
+								siblingIndex={siblingIndex}
+								className={item.isExpanded ? "row-start-2" : ""}
+							/>
+						))}
+						<AddItemCardButton
 							parent={item}
-							siblingIndex={siblingIndex}
 							className={item.isExpanded ? "row-start-2" : ""}
 						/>
-					))}
-					<AddItemCardButton
-						parent={item}
-						className={item.isExpanded ? "row-start-2" : ""}
-					/>
+					</div>
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						className={cn(styles.expand, "w-4 h-20 ml-auto hover:bg-slate-300")}
+						onClick={() => {
+							fetcher.submit(
+								{
+									intent: "toggleExpand",
+									toggleTo: !item.isExpanded,
+								},
+								{ method: "POST", action: `/item-family/${item.id}` },
+							);
+						}}
+					>
+						{item.isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+					</Button>
 				</div>
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					className={cn(styles.expand, "w-4 h-20 ml-auto hover:bg-slate-300")}
-					onClick={() => {
-						fetcher.submit(
-							{
-								intent: "toggleExpand",
-								toggleTo: !item.isExpanded,
-							},
-							{ method: "POST", action: `/item-family/${item.id}` },
-						);
-					}}
-				>
-					{item.isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-				</Button>
-			</div>
+			)}
 			<div
 				className={cn(
-					"w-52 h-36 border-2 border-dashed border-slate-100 rounded-md",
-					acceptDrop === "none" && "hidden",
-					acceptDrop === "left" && styles.insertLeft,
-					acceptDrop === "right" && styles.insertRight,
+					"pb-2 pr-2",
+					props.parent.isExpanded ? "w-8 h-full" : "w-full h-8",
+					insertAt === "none"
+						? "hidden"
+						: props.parent.isExpanded
+							? insertAt === "before"
+								? styles.insertLeft
+								: styles.insertRight
+							: insertAt === "before"
+								? styles.insertTop
+								: styles.insertBottom,
 				)}
-			/>
+			>
+				<div className={cn("bg-slate-300 w-full h-full rounded-md")} />
+			</div>
 		</div>
 	);
 }

@@ -1,9 +1,12 @@
 .layout {
 	display: grid;
-	grid-template-columns: auto auto auto;
-	grid-template-rows: 1fr;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto 1fr auto;
 	gap: 0;
-	grid-template-areas: "insert-left family insert-right";
+	grid-template-areas:
+		".           insert-top    .           "
+		"insert-left family        insert-right"
+		".           insert-bottom .           ";
 	align-items: start;
 }
 
@@ -17,6 +20,14 @@
 
 .insertRight {
 	grid-area: insert-right;
+}
+
+.insertTop {
+	grid-area: insert-top;
+}
+
+.insertBottom {
+	grid-area: insert-bottom;
 }
 
 .familyLayout {
@@ -47,7 +58,6 @@
 .expandedLayout {
 	display: grid;
 	gap: 0px;
-	/* align-items: start; */
 	justify-items: start;
 	grid-auto-flow: column;
 }

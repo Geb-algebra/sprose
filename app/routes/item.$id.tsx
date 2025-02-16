@@ -1,11 +1,13 @@
 import React from "react";
 import { useFetcher } from "react-router";
+import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { deleteItem, isItem, updateItem } from "~/map/services";
 import { cn, focusVisibleStyle } from "~/utils/css";
 import type { Route } from "./+types/item.$id";
 import styles from "./item.$id.module.css";
+import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 
 export async function clientAction({
 	request,
@@ -45,72 +47,15 @@ export function ItemCard(props: {
 	siblingIndex: number;
 	asParent: boolean;
 	className?: string;
-	isStacked?: boolean;
 }) {
 	const item = props.parent.children[props.siblingIndex];
 	const fetcher = useFetcher();
 	const [editing, setEditing] = React.useState(false);
-	const [acceptDrop, setAcceptDrop] = React.useState<"none" | "top" | "bottom">(
-		"none",
-	);
+	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
 
 	return (
-		<div
-			className={cn(styles.layout)}
-			onDragOver={(e) => {
-				if (props.asParent) return;
-				e.preventDefault();
-				e.stopPropagation();
-				const rect = e.currentTarget.getBoundingClientRect();
-				let midpoint: number;
-				switch (acceptDrop) {
-					case "top":
-						midpoint = rect.top + (rect.height / 4) * 3;
-						break;
-					case "bottom":
-						midpoint = rect.top + rect.height / 4;
-						break;
-					default:
-						midpoint = rect.top + rect.height / 2;
-				}
-				setAcceptDrop(e.clientY <= midpoint ? "top" : "bottom");
-				console.debug("acceptDrop", e.clientY <= midpoint ? "top" : "bottom");
-			}}
-			onDragLeave={(e) => {
-				if (props.asParent) return;
-				setAcceptDrop("none");
-			}}
-			onDrop={(e) => {
-				if (props.asParent) return;
-				e.preventDefault();
-				e.stopPropagation();
-				const data = e.dataTransfer.getData("application/item-card");
-				const item = JSON.parse(data);
-				console.debug("item", item);
-				if (!isItem(item)) {
-					throw new Error("Invalid item");
-				}
-				fetcher.submit(
-					{
-						movedItemId: item.id,
-						targetParentId: props.parent.id,
-						targetSiblingIndex:
-							acceptDrop === "top"
-								? props.siblingIndex
-								: props.siblingIndex + 1,
-					},
-					{ method: "post", action: "/move-item" },
-				);
-				setAcceptDrop("none");
-			}}
-		>
-			<div
-				className={cn(
-					"w-[200px] h-[72px] relative",
-					props.className,
-					styles.content,
-				)}
-			>
+		<div className={cn(styles.layout, props.className)}>
+			<div className={cn("w-[200px] h-[72px] relative", styles.content)}>
 				{editing ? (
 					<textarea
 						className={cn(
@@ -135,14 +80,6 @@ export function ItemCard(props: {
 					/>
 				) : (
 					<button
-						draggable
-						onDragStart={(e) => {
-							e.dataTransfer.effectAllowed = "move";
-							e.dataTransfer.setData(
-								"application/item-card",
-								JSON.stringify(item),
-							);
-						}}
 						type="button"
 						className={cn(
 							styles.content,
@@ -152,25 +89,19 @@ export function ItemCard(props: {
 							props.asParent ? "bg-transparent shadow-none" : "",
 						)}
 						onClick={() => setEditing(true)}
+						draggable={!props.asParent}
+						onDragStart={onDragStart}
 					>
 						{item.description}
 					</button>
 				)}
-				{props.isStacked ? (
+				{!props.asParent && item.children.length > 0 ? (
 					<>
 						<PseudoCard className="absolute top-[2px] left-[2px] z-10" />
 						<PseudoCard className="absolute top-[4px] left-[4px] z-5" />
 					</>
 				) : null}
 			</div>
-			<div
-				className={cn(
-					"w-48 h-16 bg-transparent rounded-md mr-2 mb-2 border-2 border-dashed border-slate-100",
-					acceptDrop === "none" && "hidden",
-					acceptDrop === "bottom" && styles.insertBottom,
-					acceptDrop === "top" && styles.insertTop,
-				)}
-			/>
 		</div>
 	);
 }

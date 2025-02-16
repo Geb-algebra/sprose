@@ -2,8 +2,7 @@ import { cn } from "~/utils/css";
 import styles from "./_index.module.css";
 
 import { useFetcher } from "react-router";
-import { MapRepository, createNewItem } from "~/map/lifecycle";
-import { addNewItem } from "~/map/services";
+import { MapRepository } from "~/map/lifecycle";
 import { ItemFamily } from "~/routes/item-family.$id";
 import type { Route } from "./+types/_index";
 import { AddItemCardButton } from "./add-item.$parentId";
@@ -15,23 +14,12 @@ export async function clientLoader() {
 }
 
 export default function Page({ loaderData: map }: Route.ComponentProps) {
-	console.log(map);
 	const fetcher = useFetcher();
-	const handleAddItem = async (parentId: string, description: string) => {
-		const newItem = createNewItem(description);
-		const newMap = addNewItem(parentId, map, newItem);
-		await fetcher.submit(newMap, {
-			method: "POST",
-			action: "/data-status",
-			encType: "application/json",
-		});
-		document.getElementById(newItem.id)?.focus();
-	};
 
 	return (
 		<div className={cn(styles.bodyLayout, "bg-slate-200")}>
 			<h1 className={cn(styles.title, "text-2xl text-slate-400 px-2")}>
-				User Story Mapper
+				Exporg
 			</h1>
 			<DataStatus currentItem={map} />
 			<main
