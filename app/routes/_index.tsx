@@ -7,6 +7,7 @@ import { ItemFamily } from "~/routes/item-family.$id";
 import type { Route } from "./+types/_index";
 import { AddItemCardButton } from "./add-item.$parentId";
 import { Control } from "./control";
+import Logo from "~/components/Logo";
 
 export async function clientLoader() {
 	console.debug("revalidated index");
@@ -21,10 +22,11 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 			<h1
 				className={cn(
 					styles.title,
-					"text-2xl text-slate-400 px-2 grid items-center",
+					"text-2xl text-[#002538] px-2 grid justify-start items-center grid-flow-col gap-2",
 				)}
 			>
-				Exporg
+				<Logo size={42} />
+				Sprose
 			</h1>
 			<Control className={styles.control} />
 			<main
