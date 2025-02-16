@@ -1,5 +1,5 @@
 workers_dev = true
-name = "frizz-stack"
+name = "sprose"
 compatibility_date = "2025-02-09"
 main = "./worker.ts"
 
@@ -7,3 +7,6 @@ main = "./worker.ts"
 directory = "./build/client/"
 binding = "ASSETS"
 run_worker_first = false
+
+[observability.logs]
+enabled = true
