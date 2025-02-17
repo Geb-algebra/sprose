@@ -43,7 +43,7 @@ function PseudoCard(props: { className?: string }) {
 		<div
 			className={cn(
 				props.className,
-				"w-48 h-16 shadow-sm bg-slate-100 rounded-md p-2",
+				"w-48 h-16 shadow-sm bg-card rounded-md p-2",
 			)}
 		/>
 	);
@@ -67,8 +67,8 @@ export function ItemCard(props: {
 					<textarea
 						className={cn(
 							focusVisibleStyle,
-							"absolute top-0 left-0 z-20 w-48 h-16 bg-slate-100 shadow-sm rounded-md p-2 text-sm mb-2 mr-2 resize-none",
-							props.asParent ? "bg-transparent shadow-none" : "",
+							"absolute top-0 left-0 z-20 w-48 h-16 bg-card border shadow-sm rounded-md p-2 text-sm mb-2 mr-2 resize-none",
+							props.asParent ? "bg-transparent shadow-none border-none" : "",
 						)}
 						// optimistic description update
 						defaultValue={
@@ -91,9 +91,9 @@ export function ItemCard(props: {
 						className={cn(
 							styles.content,
 							focusVisibleStyle,
-							"absolute top-0 left-0 z-20 w-48 h-16 bg-slate-100 shadow-sm rounded-md p-2 text-sm mb-2 mr-2",
+							"absolute top-0 left-0 z-20 w-48 h-16 bg-card border shadow-sm rounded-md p-2 text-sm mb-2 mr-2",
 							"grid place-content-start",
-							props.asParent ? "bg-transparent shadow-none" : "",
+							props.asParent ? "bg-transparent shadow-none border-none" : "",
 						)}
 						onClick={() => setEditing(true)}
 						draggable={!props.asParent}

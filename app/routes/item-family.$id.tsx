@@ -101,7 +101,7 @@ export function ItemFamily(props: {
 			) : (
 				<div
 					className={cn(
-						"bg-slate-50 rounded-sm shadow-sm border border-slate-100 mr-2 mb-2",
+						"bg-card rounded-sm shadow-sm border mr-2 mb-2",
 						styles.family,
 						styles.familyLayout,
 					)}
@@ -136,7 +136,7 @@ export function ItemFamily(props: {
 						type="button"
 						variant="ghost"
 						size="icon"
-						className={cn(styles.expand, "w-4 h-20 ml-auto hover:bg-slate-300")}
+						className={cn(styles.expand, "w-4 h-20 ml-auto")}
 						onClick={() => {
 							fetcher.submit(
 								{
@@ -166,7 +166,7 @@ export function ItemFamily(props: {
 								: styles.insertBottom,
 				)}
 			>
-				<div className={cn("bg-slate-300 w-full h-full rounded-md")} />
+				<div className={cn("bg-secondary w-full h-full rounded-md")} />
 			</div>
 		</div>
 	);

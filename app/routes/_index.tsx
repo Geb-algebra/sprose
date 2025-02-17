@@ -18,14 +18,14 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 	const fetcher = useFetcher();
 
 	return (
-		<div className={cn(styles.bodyLayout, "bg-slate-200")}>
+		<div className={cn(styles.bodyLayout, "bg-secondary")}>
 			<h1
 				className={cn(
 					styles.title,
-					"text-2xl text-[#002538] px-2 grid justify-start items-center grid-flow-col gap-2",
+					"text-2xl px-2 grid justify-start items-center grid-flow-col gap-2 text-primary",
 				)}
 			>
-				<Logo size={42} />
+				<Logo fill="var(--primary)" size={42} />
 				Sprose
 			</h1>
 			<Control className={styles.control} />
@@ -33,7 +33,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 				className={cn(
 					styles.main,
 					styles.mainLayout,
-					"rounded-md bg-white shadow-md p-2 overflow-auto",
+					"rounded-md bg-background shadow-md p-2 overflow-auto",
 				)}
 			>
 				{map.children.map((item, siblingIndex) => (

@@ -6,4 +6,4 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const focusVisibleStyle =
-	"focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-400 outline-none";
+	"focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring outline-none";

@@ -53,12 +53,12 @@ export function DataStatus(props: { currentItem: Item }) {
 			<ImportMarkdownButton className={styles.import} />
 			<ArrowRightIcon
 				size={18}
-				className={cn(styles.inarrow, "text-slate-400")}
+				className={cn(styles.inarrow, "text-secondary")}
 			/>
 			<DatabaseIcon size={24} className={styles.database} />
 			<ArrowRightIcon
 				size={18}
-				className={cn(styles.exarrow, "text-slate-400")}
+				className={cn(styles.exarrow, "text-secondary")}
 			/>
 			<ExportMarkdownButton className={styles.export} />
 			<div className={cn("flex items-center ml-2", styles.sync)}>

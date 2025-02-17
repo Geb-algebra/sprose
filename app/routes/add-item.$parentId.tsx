@@ -49,12 +49,12 @@ export function AddItemCardButton(props: {
 					insertAt === "before" ? styles.insert : "hidden",
 				)}
 			>
-				<div className={cn("bg-slate-300 w-full h-full rounded-md")} />
+				<div className={cn("bg-secondary w-full h-full rounded-md")} />
 			</div>
 			{writing ? (
 				<textarea
 					className={cn(
-						"w-48 h-16 mr-2 mb-2 grid place-content-center bg-slate-100 rounded-md p-2 text-sm",
+						"w-48 h-16 mr-2 mb-2 grid place-content-center bg-card rounded-md p-2 text-sm",
 						focusVisibleStyle,
 					)}
 					onBlur={(e) => {
@@ -79,8 +79,8 @@ export function AddItemCardButton(props: {
 					}}
 					className={cn(
 						"w-48 h-16 mr-2 mb-2 grid place-content-center bg-transparent rounded-md transition-colors outline-none",
-						"border-2 border-dashed border-slate-200 hover:border-slate-400 focus-visible:border-slate-400",
-						"text-2xl text-slate-200 hover:text-slate-400 focus-visible:text-slate-400",
+						"border-2 border-dashed hover:border-ring focus-visible:border-ring",
+						"text-2xl text-border hover:text-ring focus-visible:text-ring",
 					)}
 				>
 					+

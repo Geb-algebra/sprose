@@ -23,7 +23,7 @@ export function Control(props: { className?: string }) {
 		<div
 			className={cn(
 				props.className,
-				"flex gap-2 bg-slate-50 shadow-sm rounded-md w-fit p-2",
+				"flex gap-2 bg-card shadow-sm rounded-md w-fit p-2",
 			)}
 		>
 			<fetcher.Form
