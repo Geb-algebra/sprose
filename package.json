@@ -11,9 +11,9 @@
 		"test:unit:run": "vitest run",
 		"typecheck": "react-router typegen && tsc",
 		"validate": "npm run check && npm run typecheck && npm run test:unit:run",
-		"deploy": "wrangler deploy",
+		"deploy": "wrangler pages deploy",
 		"dev": "react-router dev",
-		"start": "wrangler dev"
+		"start": "wrangler pages dev"
 	},
 	"dependencies": {
 		"@radix-ui/react-slot": "^1.1.2",
