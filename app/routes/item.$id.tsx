@@ -73,7 +73,7 @@ export function ItemCard(props: {
 						)}
 						// optimistic description update
 						defaultValue={
-							// (fetcher.formData?.get("description") as string) ??
+							(fetcher.formData?.get("description") as string) ??
 							item.description
 						}
 						onBlur={(e) => {
@@ -82,6 +82,12 @@ export function ItemCard(props: {
 								{ method: "post", action: `/item/${item.id}` },
 							);
 							setEditing(false);
+						}}
+						onKeyDown={(e) => {
+							if (e.key === "Enter" && !e.shiftKey) {
+								e.preventDefault();
+								e.currentTarget.blur();
+							}
 						}}
 						// biome-ignore lint: should autofocus
 						autoFocus
@@ -101,7 +107,16 @@ export function ItemCard(props: {
 						draggable={!props.asParent}
 						onDragStart={onDragStart}
 					>
-						{item.description}
+						{(
+							(fetcher.formData?.get("description") as string) ??
+							item.description
+						)
+							.split("\n")
+							.map((line, i) => (
+								<p key={String(i) + line} className="truncate">
+									{line}
+								</p>
+							))}
 					</button>
 				)}
 				{!props.asParent && item.children.length > 0 ? (

@@ -69,25 +69,30 @@ export function AddItemCardButton(props: {
 						);
 						setWriting(false);
 					}}
+					onKeyDown={(e) => {
+						if (e.key === "Enter" && !e.shiftKey) {
+							e.preventDefault();
+							e.currentTarget.blur();
+						}
+					}}
 					// biome-ignore lint: should autofocus
 					autoFocus
 				/>
-			) : (
-				<button
-					type="button"
-					onClick={() => {
-						setWriting(true);
-					}}
-					className={cn(
-						"mr-2 mb-2 grid place-content-center bg-transparent transition-colors outline-none",
-						cardShape,
-						"border-2 border-dashed hover:border-ring focus-visible:border-ring",
-						"text-2xl text-border hover:text-ring focus-visible:text-ring",
-					)}
-				>
-					+
-				</button>
-			)}
+			) : null}
+			<button
+				type="button"
+				onClick={() => {
+					setWriting(true);
+				}}
+				className={cn(
+					"mr-2 mb-2 grid place-content-center bg-transparent transition-colors outline-none",
+					cardShape,
+					"border-2 border-dashed hover:border-ring focus-visible:border-ring",
+					"text-2xl text-border hover:text-ring focus-visible:text-ring",
+				)}
+			>
+				+
+			</button>
 		</div>
 	);
 }
