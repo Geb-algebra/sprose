@@ -1,7 +1,6 @@
 import React from "react";
 import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnInputTextArea";
-import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
@@ -58,7 +57,13 @@ export function ItemCard(props: {
 
 	return (
 		<div className={cn(styles.layout, props.className)}>
-			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
+			<div
+				className={cn(
+					"w-[232px] min-h-[88px] relative",
+					styles.content,
+					fetcher.formData?.get("description") === "" && "hidden",
+				)}
+			>
 				{editing ? (
 					<BlurOnEnterTextArea
 						className={cn(
