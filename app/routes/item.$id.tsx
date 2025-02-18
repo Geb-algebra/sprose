@@ -73,7 +73,7 @@ export function ItemCard(props: {
 						)}
 						// optimistic description update
 						defaultValue={
-							// (fetcher.formData?.get("description") as string) ??
+							(fetcher.formData?.get("description") as string) ??
 							item.description
 						}
 						onBlur={(e) => {
@@ -107,11 +107,16 @@ export function ItemCard(props: {
 						draggable={!props.asParent}
 						onDragStart={onDragStart}
 					>
-						{item.description.split("\n").map((line, i) => (
-							<p key={String(i) + line} className="truncate">
-								{line}
-							</p>
-						))}
+						{(
+							(fetcher.formData?.get("description") as string) ??
+							item.description
+						)
+							.split("\n")
+							.map((line, i) => (
+								<p key={String(i) + line} className="truncate">
+									{line}
+								</p>
+							))}
 					</button>
 				)}
 				{!props.asParent && item.children.length > 0 ? (
