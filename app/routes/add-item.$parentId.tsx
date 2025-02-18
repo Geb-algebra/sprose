@@ -51,7 +51,8 @@ export function AddItemCardButton(props: {
 		>
 			<div
 				className={cn(
-					"pb-2 pr-2 w-full h-8",
+					"pb-2 pr-2",
+					inserterShape(props.parent.isExpanded),
 					insertAt === "before" ? styles.insert : "hidden",
 				)}
 			>
