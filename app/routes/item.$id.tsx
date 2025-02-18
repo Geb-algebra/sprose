@@ -83,6 +83,12 @@ export function ItemCard(props: {
 							);
 							setEditing(false);
 						}}
+						onKeyDown={(e) => {
+							if (e.key === "Enter" && !e.shiftKey) {
+								e.preventDefault();
+								e.currentTarget.blur();
+							}
+						}}
 						// biome-ignore lint: should autofocus
 						autoFocus
 					/>
@@ -101,7 +107,11 @@ export function ItemCard(props: {
 						draggable={!props.asParent}
 						onDragStart={onDragStart}
 					>
-						{item.description}
+						{item.description.split("\n").map((line, i) => (
+							<p key={String(i) + line} className="truncate">
+								{line}
+							</p>
+						))}
 					</button>
 				)}
 				{!props.asParent && item.children.length > 0 ? (
