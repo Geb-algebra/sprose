@@ -4,7 +4,7 @@ import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { addNewItem, isItem } from "~/map/services";
-import { cn, focusVisibleStyle } from "~/utils/css";
+import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 import type { Route } from "./+types/add-item.$parentId";
 import styles from "./add-item.$parentId.module.css";
 
@@ -49,12 +49,13 @@ export function AddItemCardButton(props: {
 					insertAt === "before" ? styles.insert : "hidden",
 				)}
 			>
-				<div className={cn("bg-secondary w-full h-full rounded-md")} />
+				<div className={cn("bg-secondary w-full h-full rounded-lg")} />
 			</div>
 			{writing ? (
 				<textarea
 					className={cn(
-						"w-48 h-16 mr-2 mb-2 grid place-content-center bg-card rounded-md p-2 text-sm",
+						"mr-2 mb-2 grid place-content-center bg-card p-2 text-sm",
+						cardShape,
 						focusVisibleStyle,
 					)}
 					onBlur={(e) => {
@@ -68,24 +69,30 @@ export function AddItemCardButton(props: {
 						);
 						setWriting(false);
 					}}
+					onKeyDown={(e) => {
+						if (e.key === "Enter" && !e.shiftKey) {
+							e.preventDefault();
+							e.currentTarget.blur();
+						}
+					}}
 					// biome-ignore lint: should autofocus
 					autoFocus
 				/>
-			) : (
-				<button
-					type="button"
-					onClick={() => {
-						setWriting(true);
-					}}
-					className={cn(
-						"w-48 h-16 mr-2 mb-2 grid place-content-center bg-transparent rounded-md transition-colors outline-none",
-						"border-2 border-dashed hover:border-ring focus-visible:border-ring",
-						"text-2xl text-border hover:text-ring focus-visible:text-ring",
-					)}
-				>
-					+
-				</button>
-			)}
+			) : null}
+			<button
+				type="button"
+				onClick={() => {
+					setWriting(true);
+				}}
+				className={cn(
+					"mr-2 mb-2 grid place-content-center bg-transparent transition-colors outline-none",
+					cardShape,
+					"border-2 border-dashed hover:border-ring focus-visible:border-ring",
+					"text-2xl text-border hover:text-ring focus-visible:text-ring",
+				)}
+			>
+				+
+			</button>
 		</div>
 	);
 }

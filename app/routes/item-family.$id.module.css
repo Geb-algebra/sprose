@@ -32,7 +32,7 @@
 
 .familyLayout {
 	display: grid;
-	grid-template-columns: 1fr 16px;
+	grid-template-columns: 1fr auto;
 	grid-template-rows: 1fr;
 	gap: 0;
 	width: fit-content;

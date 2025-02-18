@@ -101,7 +101,7 @@ export function ItemFamily(props: {
 			) : (
 				<div
 					className={cn(
-						"bg-card rounded-sm shadow-sm border mr-2 mb-2",
+						"bg-card rounded-lg shadow-sm border mr-2 mb-2",
 						styles.family,
 						styles.familyLayout,
 					)}
@@ -166,7 +166,7 @@ export function ItemFamily(props: {
 								: styles.insertBottom,
 				)}
 			>
-				<div className={cn("bg-secondary w-full h-full rounded-md")} />
+				<div className={cn("bg-secondary w-full h-full rounded-lg")} />
 			</div>
 		</div>
 	);

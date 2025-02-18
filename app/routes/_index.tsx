@@ -2,12 +2,12 @@ import { cn } from "~/utils/css";
 import styles from "./_index.module.css";
 
 import { useFetcher } from "react-router";
+import Logo from "~/components/Logo";
 import { MapRepository } from "~/map/lifecycle";
 import { ItemFamily } from "~/routes/item-family.$id";
 import type { Route } from "./+types/_index";
 import { AddItemCardButton } from "./add-item.$parentId";
 import { Control } from "./control";
-import Logo from "~/components/Logo";
 
 export async function clientLoader() {
 	console.debug("revalidated index");
@@ -33,7 +33,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 				className={cn(
 					styles.main,
 					styles.mainLayout,
-					"rounded-md bg-background shadow-md p-2 overflow-auto",
+					"rounded-2xl bg-background shadow-md p-2 overflow-auto",
 				)}
 			>
 				{map.children.map((item, siblingIndex) => (
