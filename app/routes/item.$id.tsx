@@ -40,12 +40,7 @@ export async function clientAction({
 
 function PseudoCard(props: { className?: string }) {
 	return (
-		<div
-			className={cn(
-				props.className,
-				"w-56 h-20 shadow-sm bg-card rounded-md p-2",
-			)}
-		/>
+		<div className={cn(props.className, "shadow-sm bg-card p-2", cardShape)} />
 	);
 }
 
@@ -62,12 +57,12 @@ export function ItemCard(props: {
 
 	return (
 		<div className={cn(styles.layout, props.className)}>
-			<div className={cn("w-[232px] h-[88px] relative", styles.content)}>
+			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
 				{editing ? (
 					<textarea
 						className={cn(
 							focusVisibleStyle,
-							"absolute top-0 left-0 z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2 resize-none",
+							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2 resize-none",
 							cardShape,
 							props.asParent ? "bg-transparent shadow-none border-none" : "",
 						)}
@@ -98,7 +93,7 @@ export function ItemCard(props: {
 						className={cn(
 							styles.content,
 							focusVisibleStyle,
-							"absolute top-0 left-0 z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2",
+							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2",
 							cardShape,
 							"grid place-content-start text-start",
 							props.asParent ? "bg-transparent shadow-none border-none" : "",
@@ -113,18 +108,16 @@ export function ItemCard(props: {
 						)
 							.split("\n")
 							.map((line, i) => (
-								<p key={String(i) + line} className="truncate">
-									{line}
-								</p>
+								<p key={String(i) + line}>{line}</p>
 							))}
 					</button>
 				)}
-				{!props.asParent && item.children.length > 0 ? (
+				{/* {!props.asParent && item.children.length > 0 ? (
 					<>
 						<PseudoCard className="absolute top-[2px] left-[2px] z-10" />
 						<PseudoCard className="absolute top-[4px] left-[4px] z-5" />
 					</>
-				) : null}
+				) : null} */}
 			</div>
 		</div>
 	);
