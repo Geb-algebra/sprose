@@ -48,7 +48,6 @@ export function ItemFamily(props: {
 	siblingIndex: number;
 	className?: string;
 }) {
-	const item = props.parent.children[props.siblingIndex];
 	const fetcher = useFetcher();
 	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
 	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
@@ -83,6 +82,14 @@ export function ItemFamily(props: {
 			return clientY <= midpoint ? "before" : "after";
 		},
 	);
+
+	const fetcherData = fetcher.formData?.get("toggleTo");
+	const item = {
+		...props.parent.children[props.siblingIndex],
+		isExpanded: fetcherData
+			? fetcherData === "true"
+			: props.parent.children[props.siblingIndex].isExpanded,
+	};
 
 	return (
 		<div
