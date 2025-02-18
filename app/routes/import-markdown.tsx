@@ -1,6 +1,7 @@
 import { UploadIcon } from "lucide-react";
 import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
+import { TooltipButton } from "~/components/TooltipButton";
 import { MapRepository } from "~/map/lifecycle";
 import { parseMarkdownToMap } from "~/map/services";
 import type { Route } from "./+types/import-markdown";
@@ -44,15 +45,16 @@ export function ImportMarkdownButton(props: { className?: string }) {
 					}
 				}}
 			/>
-			<Button
+			<TooltipButton
 				type="button"
 				onClick={() => document.getElementById("markdownFile")?.click()}
 				variant="ghost"
 				size="icon"
 				className={props.className}
+				tooltip="Import Markdown"
 			>
 				<UploadIcon />
-			</Button>
+			</TooltipButton>
 		</fetcher.Form>
 	);
 }

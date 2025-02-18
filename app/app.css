@@ -29,7 +29,7 @@ body {
 	--popover: var(--background);
 	--popover-foreground: var(--foreground);
 	--primary: oklch(40% 0.09 var(--hue));
-	--primary-foreground: oklch(80% 0.05 var(--hue));
+	--primary-foreground: oklch(90% 0.02 var(--hue));
 	--secondary: oklch(90% 0.03 var(--hue));
 	--secondary-foreground: oklch(30% 0.09 var(--hue));
 	--muted: oklch(96% 0.0068 var(--hue));

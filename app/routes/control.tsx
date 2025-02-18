@@ -1,7 +1,7 @@
 import { RedoIcon, UndoIcon } from "lucide-react";
 import { Form, useFetcher } from "react-router";
-import { Button } from "~/components/Button";
 import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
+import { TooltipButton } from "~/components/TooltipButton";
 import { MapRepository } from "~/map/lifecycle";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/control";
@@ -27,24 +27,26 @@ export function Control(props: { className?: string }) {
 			)}
 		>
 			<fetcher.Form action="/control" method="post" className="flex w-fit">
-				<Button
+				<TooltipButton
 					type="submit"
 					name="action"
 					variant="ghost"
 					size="icon"
 					value="undo"
+					tooltip="Undo"
 				>
 					<UndoIcon size={24} />
-				</Button>
-				<Button
+				</TooltipButton>
+				<TooltipButton
 					type="submit"
 					name="action"
 					variant="ghost"
 					size="icon"
 					value="redo"
+					tooltip="Redo"
 				>
 					<RedoIcon size={24} />
-				</Button>
+				</TooltipButton>
 			</fetcher.Form>
 			<ImportMarkdownButton />
 			<ExportMarkdownButton />
