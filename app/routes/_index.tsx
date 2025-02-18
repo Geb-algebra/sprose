@@ -33,7 +33,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 				className={cn(
 					styles.main,
 					styles.mainLayout,
-					"rounded-md bg-background shadow-md p-2 overflow-auto",
+					"rounded-2xl bg-background shadow-md p-2 overflow-auto",
 				)}
 			>
 				{map.children.map((item, siblingIndex) => (

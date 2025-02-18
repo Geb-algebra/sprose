@@ -23,14 +23,10 @@ export function Control(props: { className?: string }) {
 		<div
 			className={cn(
 				props.className,
-				"flex gap-2 bg-card shadow-sm rounded-md w-fit p-2",
+				"flex bg-card shadow-sm rounded-lg w-fit p-1",
 			)}
 		>
-			<fetcher.Form
-				action="/control"
-				method="post"
-				className="flex gap-2 w-fit"
-			>
+			<fetcher.Form action="/control" method="post" className="flex w-fit">
 				<Button
 					type="submit"
 					name="action"
