@@ -1,5 +1,6 @@
 import React from "react";
 import { useFetcher } from "react-router";
+import { BlurOnEnterTextArea } from "~/components/BlurOnInputTextArea";
 import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
@@ -52,7 +53,7 @@ export function AddItemCardButton(props: {
 				<div className={cn("bg-secondary w-full h-full rounded-lg")} />
 			</div>
 			{writing ? (
-				<textarea
+				<BlurOnEnterTextArea
 					className={cn(
 						"mr-2 mb-2 grid place-content-center bg-card p-2 text-sm",
 						cardShape,
@@ -69,14 +70,6 @@ export function AddItemCardButton(props: {
 						);
 						setWriting(false);
 					}}
-					onKeyDown={(e) => {
-						if (e.key === "Enter" && !e.shiftKey) {
-							e.preventDefault();
-							e.currentTarget.blur();
-						}
-					}}
-					// biome-ignore lint: should autofocus
-					autoFocus
 				/>
 			) : null}
 			<button
