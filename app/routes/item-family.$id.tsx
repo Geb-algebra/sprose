@@ -9,7 +9,7 @@ import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { addNewItem, updateItem } from "~/map/services";
 import { AddItemCardButton } from "~/routes/add-item.$parentId";
-import { cn } from "~/utils/css";
+import { cn, inserterShape } from "~/utils/css";
 import type { Route } from "./+types/item-family.$id";
 import styles from "./item-family.$id.module.css";
 import { ItemCard } from "./item.$id";
@@ -153,8 +153,8 @@ export function ItemFamily(props: {
 			)}
 			<div
 				className={cn(
-					"pb-2 pr-2",
-					props.parent.isExpanded ? "w-8 h-full" : "w-full h-8",
+					inserterShape(props.parent.isExpanded),
+					"pr-2 pb-2",
 					insertAt === "none"
 						? "hidden"
 						: props.parent.isExpanded

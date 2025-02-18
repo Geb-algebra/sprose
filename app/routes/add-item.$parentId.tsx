@@ -5,7 +5,7 @@ import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { addNewItem, isItem } from "~/map/services";
-import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
+import { cardShape, cn, focusVisibleStyle, inserterShape } from "~/utils/css";
 import type { Route } from "./+types/add-item.$parentId";
 import styles from "./add-item.$parentId.module.css";
 
@@ -39,7 +39,12 @@ export function AddItemCardButton(props: {
 	);
 	return (
 		<div
-			className={cn(props.className, styles.layout)}
+			className={cn(
+				props.className,
+				props.parent.isExpanded
+					? styles.expandedLayout
+					: styles.collapsedLayout,
+			)}
 			onDragOver={onDragOver}
 			onDragLeave={onDragLeave}
 			onDrop={onDrop}
@@ -55,8 +60,9 @@ export function AddItemCardButton(props: {
 			{writing ? (
 				<BlurOnEnterTextArea
 					className={cn(
-						"mr-2 mb-2 grid place-content-center bg-card p-2 text-sm",
+						"mr-2 mb-2 grid place-content-center bg-card p-2 text-sm resize-none",
 						cardShape,
+						"h-20",
 						focusVisibleStyle,
 					)}
 					onBlur={(e) => {
@@ -72,20 +78,41 @@ export function AddItemCardButton(props: {
 					}}
 				/>
 			) : null}
-			<button
-				type="button"
-				onClick={() => {
-					setWriting(true);
-				}}
-				className={cn(
-					"mr-2 mb-2 grid place-content-center bg-transparent transition-colors outline-none",
-					cardShape,
-					"border-2 border-dashed hover:border-ring focus-visible:border-ring",
-					"text-2xl text-border hover:text-ring focus-visible:text-ring",
-				)}
-			>
-				+
-			</button>
+			{props.parent.id === "__root" ? (
+				<button
+					type="button"
+					onClick={() => {
+						setWriting(true);
+					}}
+					className={cn(
+						"rounded-lg grid place-content-center bg-transparent transition-colors outline-none",
+						cardShape,
+						"h-20",
+						"border-2 border-dashed hover:border-ring focus-visible:border-ring",
+						"text-2xl text-border hover:text-ring focus-visible:text-ring",
+					)}
+				>
+					+
+				</button>
+			) : (
+				<div
+					className={cn(inserterShape(props.parent.isExpanded), "pr-2 pb-2")}
+				>
+					<button
+						type="button"
+						onClick={() => {
+							setWriting(true);
+						}}
+						className={cn(
+							"w-full h-full rounded-lg grid place-content-center bg-transparent transition-colors outline-none",
+							"border-2 border-dashed hover:border-ring focus-visible:border-ring",
+							"text-2xl text-border hover:text-ring focus-visible:text-ring",
+						)}
+					>
+						+
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }
