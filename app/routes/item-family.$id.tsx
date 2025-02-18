@@ -7,7 +7,7 @@ import {
 } from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { addNewItem, updateItem } from "~/map/services";
+import { addNewItem, findChildById, updateItem } from "~/map/services";
 import { AddItemCardButton } from "~/routes/add-item.$parentId";
 import { cn, inserterShape } from "~/utils/css";
 import type { Route } from "./+types/item-family.$id";
@@ -35,6 +35,13 @@ export async function clientAction({
 		await MapRepository.save(newMap);
 	} else if (intent === "toggleExpand") {
 		const map = await MapRepository.get();
+		const item = findChildById(map, id);
+		if (!item) {
+			throw new Error("Invalid item");
+		}
+		if (item.children.length === 0) {
+			return null;
+		}
 		const toggleTo = formData.get("toggleTo") === "true";
 		const newMap = updateItem(map, { id, isExpanded: toggleTo });
 		await MapRepository.save(newMap);
@@ -143,7 +150,11 @@ export function ItemFamily(props: {
 						type="button"
 						variant="ghost"
 						size="icon"
-						className={cn(styles.expand, "w-4 h-20 ml-auto")}
+						className={cn(
+							styles.expand,
+							"w-4 h-20 ml-auto",
+							item.children.length === 0 && "hidden",
+						)}
 						onClick={() => {
 							fetcher.submit(
 								{
