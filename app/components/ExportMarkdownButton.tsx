@@ -2,6 +2,7 @@ import { DownloadIcon } from "lucide-react";
 import { Button } from "~/components/Button";
 import { MapRepository } from "~/map/lifecycle";
 import { serializeMapToMarkdown } from "~/map/services";
+import { TooltipButton } from "./TooltipButton";
 
 export function ExportMarkdownButton(props: { className?: string }) {
 	const handleExport = async () => {
@@ -19,13 +20,14 @@ export function ExportMarkdownButton(props: { className?: string }) {
 	};
 
 	return (
-		<Button
+		<TooltipButton
 			onClick={handleExport}
 			variant="ghost"
 			size="icon"
 			className={props.className}
+			tooltip="Export Markdown"
 		>
 			<DownloadIcon />
-		</Button>
+		</TooltipButton>
 	);
 }
