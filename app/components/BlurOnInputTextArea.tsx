@@ -21,6 +21,12 @@ export function BlurOnEnterTextArea(props: {
 					e.currentTarget.blur();
 				}
 			}}
+			onFocus={(e) => {
+				e.currentTarget.style.height = `${Math.max(e.currentTarget.scrollHeight, 80)}px`;
+			}}
+			onInput={(e) => {
+				e.currentTarget.style.height = `${Math.max(e.currentTarget.scrollHeight, 80)}px`;
+			}}
 			// biome-ignore lint: should autofocus
 			autoFocus
 		/>
