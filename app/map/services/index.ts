@@ -63,7 +63,6 @@ export function updateItem(
 
 /**
  * Adds a new item as a child of the item with the given ID.
- * if no ID is provided, the item is added as a root item.
  */
 export function addNewItem(
 	parentId: string,

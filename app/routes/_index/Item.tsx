@@ -1,42 +1,9 @@
 import React from "react";
-import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useStartCardInsert } from "~/map/hooks/useCardInsert";
-import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { deleteItem, findChildById, isItem, updateItem } from "~/map/services";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
-import type { Route } from "./+types/item.$id";
-import styles from "./item.$id.module.css";
-
-export async function clientAction({
-	request,
-	params,
-}: Route.ClientActionArgs) {
-	const { id } = params;
-	const formData = await request.formData();
-	const newDescription = formData.get("description");
-	if (typeof newDescription !== "string") {
-		throw new Error("Invalid description");
-	}
-	const map = await MapRepository.get();
-	const currentItem = findChildById(map, id);
-	if (!currentItem || !isItem(currentItem)) {
-		throw new Error("Invalid item");
-	}
-	if (currentItem.description === newDescription) {
-		return null;
-	}
-
-	let newMap: Item;
-	if (newDescription.trim() === "") {
-		newMap = deleteItem(id, map);
-	} else {
-		newMap = updateItem(map, { id, description: newDescription });
-	}
-	await MapRepository.save(newMap);
-	return null;
-}
+import styles from "./Item.module.css";
 
 function PseudoCard(props: { className?: string }) {
 	return (
@@ -49,21 +16,16 @@ export function ItemCard(props: {
 	siblingIndex: number;
 	asParent: boolean;
 	className?: string;
+	onUpdateItemText: (itemId: string, description: string) => void;
+	onDeleteItem: (itemId: string) => void;
 }) {
 	const item = props.parent.children[props.siblingIndex];
-	const fetcher = useFetcher();
 	const [editing, setEditing] = React.useState(false);
 	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
 
 	return (
 		<div className={cn(styles.layout, props.className)}>
-			<div
-				className={cn(
-					"w-[232px] min-h-[88px] relative",
-					styles.content,
-					fetcher.formData?.get("description") === "" && "hidden",
-				)}
-			>
+			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
 				{editing ? (
 					<BlurOnEnterTextArea
 						className={cn(
@@ -72,16 +34,13 @@ export function ItemCard(props: {
 							cardShape,
 							props.asParent ? "bg-transparent shadow-none border-none" : "",
 						)}
-						// optimistic description update
-						defaultValue={
-							(fetcher.formData?.get("description") as string) ??
-							item.description
-						}
+						defaultValue={item.description}
 						onBlur={(e) => {
-							fetcher.submit(
-								{ description: e.target.value },
-								{ method: "post", action: `/item/${item.id}` },
-							);
+							if (e.target.value.trim() !== "") {
+								props.onUpdateItemText(item.id, e.target.value);
+							} else {
+								props.onDeleteItem(item.id);
+							}
 							setEditing(false);
 						}}
 					/>
@@ -100,14 +59,9 @@ export function ItemCard(props: {
 						draggable={!props.asParent}
 						onDragStart={onDragStart}
 					>
-						{(
-							(fetcher.formData?.get("description") as string) ??
-							item.description
-						)
-							.split("\n")
-							.map((line, i) => (
-								<p key={String(i) + line}>{line}</p>
-							))}
+						{item.description.split("\n").map((line, i) => (
+							<p key={String(i) + line}>{line}</p>
+						))}
 					</button>
 				)}
 				{/* {!props.asParent && item.children.length > 0 ? (
