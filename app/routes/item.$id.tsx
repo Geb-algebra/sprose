@@ -1,6 +1,6 @@
 import React from "react";
 import { useFetcher } from "react-router";
-import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
+import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
@@ -57,9 +57,15 @@ export function ItemCard(props: {
 
 	return (
 		<div className={cn(styles.layout, props.className)}>
-			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
+			<div
+				className={cn(
+					"w-[232px] min-h-[88px] relative",
+					styles.content,
+					fetcher.formData?.get("description") === "" && "hidden",
+				)}
+			>
 				{editing ? (
-					<textarea
+					<BlurOnEnterTextArea
 						className={cn(
 							focusVisibleStyle,
 							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2 resize-none",
@@ -78,14 +84,6 @@ export function ItemCard(props: {
 							);
 							setEditing(false);
 						}}
-						onKeyDown={(e) => {
-							if (e.key === "Enter" && !e.shiftKey) {
-								e.preventDefault();
-								e.currentTarget.blur();
-							}
-						}}
-						// biome-ignore lint: should autofocus
-						autoFocus
 					/>
 				) : (
 					<button
