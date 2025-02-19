@@ -1,61 +1,29 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import {
 	useAcceptCardInsert,
 	useStartCardInsert,
 } from "~/map/hooks/useCardInsert";
-import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { addNewItem, findChildById, updateItem } from "~/map/services";
-import { AddItemCardButton } from "~/routes/add-item.$parentId";
+import { AddItemButton } from "~/routes/_index/AddItemButton";
 import { cn, inserterShape } from "~/utils/css";
-import type { Route } from "./+types/item-family.$id";
-import styles from "./item-family.$id.module.css";
-import { ItemCard } from "./item.$id";
-
-export async function clientAction({
-	request,
-	params,
-}: Route.ClientActionArgs) {
-	const { id } = params;
-	const formData = await request.formData();
-	const intent = formData.get("intent");
-	if (typeof intent !== "string") {
-		throw new Error("Invalid intent");
-	}
-	if (intent === "addNewItem") {
-		const description = formData.get("description");
-		if (typeof description !== "string") {
-			throw new Error("Invalid description");
-		}
-		const map = await MapRepository.get();
-		const newItem = createNewItem(description);
-		const newMap = addNewItem(id, map, newItem);
-		await MapRepository.save(newMap);
-	} else if (intent === "toggleExpand") {
-		const map = await MapRepository.get();
-		const item = findChildById(map, id);
-		if (!item) {
-			throw new Error("Invalid item");
-		}
-		if (item.children.length === 0) {
-			return null;
-		}
-		const toggleTo = formData.get("toggleTo") === "true";
-		const newMap = updateItem(map, { id, isExpanded: toggleTo });
-		await MapRepository.save(newMap);
-		return null;
-	}
-	return null;
-}
+import { ItemCard } from "./Item";
+import styles from "./ItemFamily.module.css";
 
 export function ItemFamily(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
+	onAddItem: (parentId: string, description: string) => void;
+	onMoveItem: (
+		movedItemId: string,
+		targetParentId: string,
+		targetSiblingIndex: number,
+	) => void;
+	onUpdateItemText: (itemId: string, description: string) => void;
+	onDeleteItem: (itemId: string) => void;
+	onToggleExpand: (itemId: string) => void;
 }) {
-	const fetcher = useFetcher();
 	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
 	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
 		props.parent,
@@ -88,15 +56,10 @@ export function ItemFamily(props: {
 			}
 			return clientY <= midpoint ? "before" : "after";
 		},
+		props.onMoveItem,
 	);
 
-	const fetcherData = fetcher.formData?.get("toggleTo");
-	const item = {
-		...props.parent.children[props.siblingIndex],
-		isExpanded: fetcherData
-			? fetcherData === "true"
-			: props.parent.children[props.siblingIndex].isExpanded,
-	};
+	const item = props.parent.children[props.siblingIndex];
 
 	return (
 		<div
@@ -111,6 +74,8 @@ export function ItemFamily(props: {
 					parent={props.parent}
 					siblingIndex={props.siblingIndex}
 					className={styles.family}
+					onUpdateItemText={props.onUpdateItemText}
+					onDeleteItem={props.onDeleteItem}
 				/>
 			) : (
 				<div
@@ -132,6 +97,8 @@ export function ItemFamily(props: {
 							asParent
 							parent={props.parent}
 							siblingIndex={props.siblingIndex}
+							onUpdateItemText={props.onUpdateItemText}
+							onDeleteItem={props.onDeleteItem}
 						/>
 						{item.children.map((child, siblingIndex) => (
 							<ItemFamily
@@ -139,11 +106,18 @@ export function ItemFamily(props: {
 								parent={item}
 								siblingIndex={siblingIndex}
 								className={item.isExpanded ? "row-start-2" : ""}
+								onAddItem={props.onAddItem}
+								onMoveItem={props.onMoveItem}
+								onUpdateItemText={props.onUpdateItemText}
+								onDeleteItem={props.onDeleteItem}
+								onToggleExpand={props.onToggleExpand}
 							/>
 						))}
-						<AddItemCardButton
+						<AddItemButton
 							parent={item}
 							className={item.isExpanded ? "row-start-2" : ""}
+							onAddItem={props.onAddItem}
+							onMoveItem={props.onMoveItem}
 						/>
 					</div>
 					<Button
@@ -155,15 +129,7 @@ export function ItemFamily(props: {
 							"w-4 h-20 ml-auto",
 							item.children.length === 0 && "hidden",
 						)}
-						onClick={() => {
-							fetcher.submit(
-								{
-									intent: "toggleExpand",
-									toggleTo: !item.isExpanded,
-								},
-								{ method: "POST", action: `/item-family/${item.id}` },
-							);
-						}}
+						onClick={() => props.onToggleExpand(item.id)}
 					>
 						{item.isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 					</Button>

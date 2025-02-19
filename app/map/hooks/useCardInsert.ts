@@ -27,8 +27,12 @@ export function useAcceptCardInsert(
 		clientY: number;
 		insertAt: InsertAt;
 	}) => InsertAt,
+	onMoveItem: (
+		movedItemId: string,
+		targetParentId: string,
+		targetSiblingIndex: number,
+	) => void,
 ) {
-	const fetcher = useFetcher();
 	const item = parent.children[siblingIndex];
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
 
@@ -58,17 +62,10 @@ export function useAcceptCardInsert(
 		if (!isItem(item)) {
 			throw new Error("Invalid item");
 		}
-		fetcher.submit(
-			{
-				movedItemId: item.id,
-				targetParentId: parent.id,
-				targetSiblingIndex:
-					insertAt === "before" ? siblingIndex : siblingIndex + 1,
-			},
-			{
-				method: "post",
-				action: "/move-item",
-			},
+		onMoveItem(
+			item.id,
+			parent.id,
+			insertAt === "before" ? siblingIndex : siblingIndex + 1,
 		);
 		setInsertAt("none");
 	}
