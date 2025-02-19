@@ -51,7 +51,6 @@
 	display: grid;
 	gap: 0px;
 	align-items: start;
-	justify-items: start;
 	grid-auto-flow: row;
 }
 

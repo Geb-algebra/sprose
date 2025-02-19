@@ -75,10 +75,15 @@ export class MapRepository {
 	}
 }
 
-function generateId(): string {
+export function generateId(): string {
 	return Math.random().toString(36).substr(2, 9);
 }
 
-export function createNewItem(description: string): Item {
-	return { id: generateId(), description, isExpanded: false, children: [] };
+export function createNewItem(description: string, id?: string): Item {
+	return {
+		id: id ?? generateId(),
+		description,
+		isExpanded: false,
+		children: [],
+	};
 }
