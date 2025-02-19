@@ -1,6 +1,6 @@
 import React from "react";
 import { useFetcher } from "react-router";
-import { BlurOnEnterTextArea } from "~/components/BlurOnInputTextArea";
+import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
@@ -19,8 +19,12 @@ export async function clientAction({
 	if (typeof parentId !== "string" || typeof description !== "string") {
 		throw new Error("Invalid form data");
 	}
+	const id = formData.get("id");
+	if (typeof id !== "string") {
+		throw new Error("Invalid id");
+	}
 	const map = await MapRepository.get();
-	const newItem = createNewItem(description);
+	const newItem = createNewItem(description, id);
 	const newMap = addNewItem(parentId, map, newItem);
 	await MapRepository.save(newMap);
 	return null;
@@ -71,10 +75,13 @@ export function AddItemCardButton(props: {
 							setWriting(false);
 							return;
 						}
-						fetcher.submit(
-							{ description: e.target.value },
-							{ method: "post", action: `/add-item/${props.parent.id}` },
-						);
+						const newItem = createNewItem(e.target.value);
+						fetcher.submit(newItem, {
+							method: "post",
+							action: `/add-item/${props.parent.id}`,
+						});
+						// XXX: mutate parent's state from a child.
+						props.parent.children.push(newItem);
 						setWriting(false);
 					}}
 				/>

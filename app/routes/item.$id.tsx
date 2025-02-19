@@ -1,6 +1,6 @@
 import React from "react";
 import { useFetcher } from "react-router";
-import { BlurOnEnterTextArea } from "~/components/BlurOnInputTextArea";
+import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
