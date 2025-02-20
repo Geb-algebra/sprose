@@ -22,11 +22,7 @@ export function useAcceptCardInsert(
 		clientY: number;
 		insertAt: InsertAt;
 	}) => InsertAt,
-	moveItem: (
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) => void,
+	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void,
 ) {
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
 
@@ -53,11 +49,7 @@ export function useAcceptCardInsert(
 		e.stopPropagation();
 		const data = e.dataTransfer.getData("application/item-card");
 		const item = itemSchema.parse(JSON.parse(data));
-		moveItem(
-			item.id,
-			parent.id,
-			insertAt === "before" ? siblingIndex : siblingIndex + 1,
-		);
+		moveItem(item.id, parent.id, insertAt === "before" ? siblingIndex : siblingIndex + 1);
 		setInsertAt("none");
 	}
 

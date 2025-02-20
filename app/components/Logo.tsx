@@ -1,9 +1,6 @@
 import * as React from "react";
 
-const SvgIcon = ({
-	fill = "#002538",
-	size = 56,
-}: { fill?: string; size?: number }) => (
+const SvgIcon = ({ fill = "#002538", size = 56 }: { fill?: string; size?: number }) => (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		width={size}

@@ -11,11 +11,7 @@ export function AddItemButton(props: {
 	parent: Item;
 	className?: string;
 	addItem: (item: Item) => void;
-	moveItem: (
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) => void;
+	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void;
 }) {
 	const [writing, setWriting] = React.useState(false);
 	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
@@ -28,9 +24,7 @@ export function AddItemButton(props: {
 		<div
 			className={cn(
 				props.className,
-				props.parent.isExpanded
-					? styles.expandedLayout
-					: styles.collapsedLayout,
+				props.parent.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
 			)}
 			onDragOver={onDragOver}
 			onDragLeave={onDragLeave}
@@ -78,9 +72,7 @@ export function AddItemButton(props: {
 					+
 				</button>
 			) : (
-				<div
-					className={cn(inserterShape(props.parent.isExpanded), "pr-2 pb-2")}
-				>
+				<div className={cn(inserterShape(props.parent.isExpanded), "pr-2 pb-2")}>
 					<button
 						type="button"
 						onClick={() => {

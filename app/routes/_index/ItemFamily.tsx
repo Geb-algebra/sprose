@@ -7,15 +7,9 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import {
-	useAcceptCardInsert,
-	useStartCardInsert,
-} from "~/map/hooks/useCardInsert";
+import { useAcceptCardInsert, useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { type Item, itemSchema } from "~/map/models";
-import {
-	copyItemToClipboard,
-	getChildFromClipboard,
-} from "~/map/services/clipboard.client";
+import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
 import { cn, inserterShape } from "~/utils/css";
 import { AddItemButton } from "./AddItemButton";
 import { ItemCard } from "./Item";
@@ -25,11 +19,7 @@ export function ItemFamily(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
-	moveItem: (
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) => void;
+	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void;
 }) {
 	const fetcher = useFetcher();
 	function submitJson(newItem: Item, method: "PUT" | "DELETE") {
@@ -90,18 +80,13 @@ export function ItemFamily(props: {
 						<ItemCard asParent={false} item={item} />
 					) : (
 						<div
-							className={cn(
-								"bg-card rounded-lg shadow-sm border mr-2 mb-2",
-								styles.familyLayout,
-							)}
+							className={cn("bg-card rounded-lg shadow-sm border mr-2 mb-2", styles.familyLayout)}
 							draggable
 							onDragStart={onDragStart}
 						>
 							<div
 								className={cn(
-									item.isExpanded
-										? styles.expandedLayout
-										: styles.collapsedLayout,
+									item.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
 									styles.content,
 								)}
 							>
@@ -119,10 +104,7 @@ export function ItemFamily(props: {
 									parent={item}
 									className={item.isExpanded ? "row-start-2" : ""}
 									addItem={(addedChild: Item) => {
-										submitJson(
-											{ ...item, children: [...item.children, addedChild] },
-											"PUT",
-										);
+										submitJson({ ...item, children: [...item.children, addedChild] }, "PUT");
 									}}
 									moveItem={props.moveItem}
 								/>
@@ -136,9 +118,7 @@ export function ItemFamily(props: {
 									"w-4 h-20 ml-auto",
 									item.children.length === 0 && "hidden",
 								)}
-								onClick={() =>
-									submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")
-								}
+								onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
 							>
 								{item.isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 							</Button>
@@ -171,10 +151,7 @@ export function ItemFamily(props: {
 					onClick={async () => {
 						const newChildren = await getChildFromClipboard();
 						if (newChildren) {
-							submitJson(
-								{ ...item, children: [...item.children, ...newChildren] },
-								"PUT",
-							);
+							submitJson({ ...item, children: [...item.children, ...newChildren] }, "PUT");
 						}
 					}}
 				>

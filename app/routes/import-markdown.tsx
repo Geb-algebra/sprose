@@ -21,11 +21,7 @@ export function ImportMarkdownButton(props: { className?: string }) {
 	const fetcher = useFetcher();
 
 	return (
-		<fetcher.Form
-			method="post"
-			action="/import-markdown"
-			encType="multipart/form-data"
-		>
+		<fetcher.Form method="post" action="/import-markdown" encType="multipart/form-data">
 			<input
 				type="file"
 				name="markdownFile"
@@ -34,14 +30,11 @@ export function ImportMarkdownButton(props: { className?: string }) {
 				style={{ display: "none" }}
 				onChange={(e) => {
 					if (e.currentTarget.files && e.currentTarget.files.length > 0) {
-						fetcher.submit(
-							new FormData(e.currentTarget.form as HTMLFormElement),
-							{
-								method: "post",
-								encType: "multipart/form-data",
-								action: "/import-markdown",
-							},
-						);
+						fetcher.submit(new FormData(e.currentTarget.form as HTMLFormElement), {
+							method: "post",
+							encType: "multipart/form-data",
+							action: "/import-markdown",
+						});
 					}
 				}}
 			/>

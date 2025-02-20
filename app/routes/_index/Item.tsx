@@ -7,9 +7,7 @@ import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 import styles from "./item.module.css";
 
 function PseudoCard(props: { className?: string }) {
-	return (
-		<div className={cn(props.className, "shadow-sm bg-card p-2", cardShape)} />
-	);
+	return <div className={cn(props.className, "shadow-sm bg-card p-2", cardShape)} />;
 }
 
 export function ItemCard(props: {

@@ -1,9 +1,6 @@
 import type { Item } from "~/map/models";
 
-export function updateItem(
-	items: Item,
-	newItem: { id: string } & Partial<Item>,
-): Item {
+export function updateItem(items: Item, newItem: { id: string } & Partial<Item>): Item {
 	if (items.id === newItem.id) {
 		return { ...items, ...newItem };
 	}
@@ -16,27 +13,16 @@ export function updateItem(
 /**
  * Adds a new item as a child of the item with the given ID.
  */
-export function addNewItem(
-	parentId: string,
-	map: Item,
-	newItem: Item,
-	at = 10000000000000,
-): Item {
+export function addNewItem(parentId: string, map: Item, newItem: Item, at = 10000000000000): Item {
 	if (parentId === map.id) {
 		return {
 			...map,
-			children: [
-				...map.children.slice(0, at),
-				newItem,
-				...map.children.slice(at, 10000000000000),
-			],
+			children: [...map.children.slice(0, at), newItem, ...map.children.slice(at, 10000000000000)],
 		};
 	}
 	return {
 		...map,
-		children: map.children.map((child) =>
-			addNewItem(parentId, child, newItem, at),
-		),
+		children: map.children.map((child) => addNewItem(parentId, child, newItem, at)),
 	};
 }
 
