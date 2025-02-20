@@ -1,7 +1,5 @@
 import React from "react";
-import { useFetcher } from "react-router";
-import type { Item } from "../models";
-import { isItem } from "../services";
+import { type Item, itemSchema } from "../models";
 
 const cardType = "application/item-card";
 type InsertAt = "none" | "before" | "after";
@@ -54,10 +52,7 @@ export function useAcceptCardInsert(
 		e.preventDefault();
 		e.stopPropagation();
 		const data = e.dataTransfer.getData("application/item-card");
-		const item = JSON.parse(data);
-		if (!isItem(item)) {
-			throw new Error("Invalid item");
-		}
+		const item = itemSchema.parse(JSON.parse(data));
 		moveItem(
 			item.id,
 			parent.id,

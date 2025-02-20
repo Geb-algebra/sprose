@@ -11,7 +11,7 @@ import {
 	useAcceptCardInsert,
 	useStartCardInsert,
 } from "~/map/hooks/useCardInsert";
-import type { Item } from "~/map/models";
+import { type Item, itemSchema } from "~/map/models";
 import {
 	copyItemToClipboard,
 	getChildFromClipboard,
@@ -38,7 +38,10 @@ export function ItemFamily(props: {
 			encType: "application/json",
 		});
 	}
-	const item = props.parent.children[props.siblingIndex];
+	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
+	const item = possiblyNewItem.success
+		? possiblyNewItem.data
+		: props.parent.children[props.siblingIndex];
 	const onDragStart = useStartCardInsert(item);
 	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
 		props.parent,

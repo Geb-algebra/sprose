@@ -68,22 +68,6 @@ export function deleteItem(itemId: string, item: Item): Item {
 	};
 }
 
-export function isItem(item: Item): item is Item {
-	if (typeof item.id !== "string" || !item.id.trim()) {
-		return false;
-	}
-	if (typeof item.description !== "string") {
-		return false;
-	}
-	if (typeof item.isExpanded !== "boolean") {
-		return false;
-	}
-	if (!Array.isArray(item.children)) {
-		return false;
-	}
-	return item.children.every(isItem);
-}
-
 export function findChildById(item: Item, id: string): Item | null {
 	if (item.id === id) {
 		return item;

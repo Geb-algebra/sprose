@@ -2,7 +2,7 @@ import React from "react";
 import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useStartCardInsert } from "~/map/hooks/useCardInsert";
-import type { Item } from "~/map/models";
+import { type Item, itemSchema } from "~/map/models";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 import styles from "./item.module.css";
 
@@ -24,10 +24,10 @@ export function ItemCard(props: {
 			encType: "application/json",
 		});
 	}
-	// activate after introducing zod for isItem
-	// const item = isItem(fetcher.json) ?? props.item;
+	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
+	const item = possiblyNewItem.success ? possiblyNewItem.data : props.item;
 	const [editing, setEditing] = React.useState(false);
-	const onDragStart = useStartCardInsert(props.item);
+	const onDragStart = useStartCardInsert(item);
 
 	return (
 		<div className={cn(styles.childLayout, props.className)}>
@@ -40,15 +40,12 @@ export function ItemCard(props: {
 							cardShape,
 							props.asParent ? "bg-transparent shadow-none border-none" : "",
 						)}
-						defaultValue={props.item.description}
+						defaultValue={item.description}
 						onBlur={(e) => {
 							if (e.target.value.trim() !== "") {
-								submitJson(
-									{ ...props.item, description: e.target.value },
-									"PUT",
-								);
+								submitJson({ ...item, description: e.target.value }, "PUT");
 							} else {
-								submitJson(props.item, "DELETE");
+								submitJson(item, "DELETE");
 							}
 							setEditing(false);
 						}}
@@ -68,7 +65,7 @@ export function ItemCard(props: {
 						draggable={!props.asParent}
 						onDragStart={onDragStart}
 					>
-						{props.item.description.split("\n").map((line, i) => (
+						{item.description.split("\n").map((line, i) => (
 							<p key={String(i) + line}>{line}</p>
 						))}
 					</button>

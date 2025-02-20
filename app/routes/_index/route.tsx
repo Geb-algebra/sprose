@@ -10,8 +10,8 @@ import {
 } from "~/components/ContextMenu";
 import Logo from "~/components/Logo";
 import { MapRepository } from "~/map/lifecycle";
-import type { Item } from "~/map/models";
-import { deleteItem, isItem, moveItem, updateItem } from "~/map/services";
+import { type Item, itemSchema } from "~/map/models";
+import { deleteItem, moveItem, updateItem } from "~/map/services";
 import {
 	copyItemToClipboard,
 	getChildFromClipboard,
@@ -26,10 +26,7 @@ export async function clientLoader() {
 }
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
-	const newItem = await request.json();
-	if (!isItem(newItem)) {
-		throw new Error("Invalid map");
-	}
+	const newItem = itemSchema.parse(await request.json());
 	const map = await MapRepository.get();
 	let newMap: Item;
 	if (request.method === "DELETE") {
@@ -46,9 +43,10 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	return null;
 }
 
-export default function Page({ loaderData: map }: Route.ComponentProps) {
+export default function Page({ loaderData }: Route.ComponentProps) {
 	const fetcher = useFetcher();
-
+	const possiblyNewMap = itemSchema.safeParse(fetcher.json);
+	const map = possiblyNewMap.success ? possiblyNewMap.data : loaderData;
 	function submitJson(map: Item) {
 		fetcher.submit(map, {
 			method: "PUT",
