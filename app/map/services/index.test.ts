@@ -5,8 +5,8 @@ import {
 	deleteItem,
 	findParentByChildId,
 	moveItem,
-	parseMarkdownToMap,
-	serializeMapToMarkdown,
+	parseMarkdownToItem,
+	serializeItemToMarkdown,
 	updateItem,
 } from "./index";
 
@@ -136,13 +136,13 @@ describe("parseMarkdownToMap", () => {
 				},
 			],
 		};
-		const result = parseMarkdownToMap(markdown);
+		const result = parseMarkdownToItem(markdown);
 		expect(result).toEqual(expected);
 	});
 
 	it("should handle an empty markdown string", () => {
 		const markdown = "";
-		const result = parseMarkdownToMap(markdown);
+		const result = parseMarkdownToItem(markdown);
 		expect(result).toEqual({
 			id: "__root",
 			description: "",
@@ -157,15 +157,15 @@ describe("serializeMapToMarkdown", () => {
 		const map = getSampleMap();
 
 		const expected = `- Item 1
-  - Item 2
-    - Item 5
-    - Item 6
-  - Item 3
-  - Item 4
-    - Item 7
+    - Item 2
+        - Item 5
+        - Item 6
+    - Item 3
+    - Item 4
+        - Item 7
 - Item 8`;
 
-		const result = serializeMapToMarkdown(map);
+		const result = serializeItemToMarkdown(map);
 		expect(result).toEqual(expected);
 	});
 
@@ -176,7 +176,7 @@ describe("serializeMapToMarkdown", () => {
 			isExpanded: false,
 			children: [],
 		};
-		const result = serializeMapToMarkdown(map);
+		const result = serializeItemToMarkdown(map);
 		expect(result).toEqual("");
 	});
 });
