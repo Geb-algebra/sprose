@@ -1,13 +1,13 @@
 import { DownloadIcon } from "lucide-react";
 import { Button } from "~/components/Button";
 import { MapRepository } from "~/map/lifecycle";
-import { serializeMapToMarkdown } from "~/map/services";
+import { serializeItemToMarkdown } from "~/map/services";
 import { TooltipButton } from "./TooltipButton";
 
 export function ExportMarkdownButton(props: { className?: string }) {
 	const handleExport = async () => {
 		const map = await MapRepository.get();
-		const markdownText = serializeMapToMarkdown(map);
+		const markdownText = serializeItemToMarkdown(map);
 		const blob = new Blob([markdownText], { type: "text/markdown" });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement("a");

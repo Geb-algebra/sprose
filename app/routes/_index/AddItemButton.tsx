@@ -2,37 +2,20 @@ import React from "react";
 import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
-import { MapRepository, createNewItem } from "~/map/lifecycle";
+import { createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { addNewItem, isItem } from "~/map/services";
 import { cardShape, cn, focusVisibleStyle, inserterShape } from "~/utils/css";
-import type { Route } from "./+types/add-item.$parentId";
-import styles from "./add-item.$parentId.module.css";
+import styles from "./AddItemButton.module.css";
 
-export async function clientAction({
-	request,
-	params,
-}: Route.ClientActionArgs) {
-	const parentId = params.parentId;
-	const formData = await request.formData();
-	const description = formData.get("description");
-	if (typeof parentId !== "string" || typeof description !== "string") {
-		throw new Error("Invalid form data");
-	}
-	const id = formData.get("id");
-	if (typeof id !== "string") {
-		throw new Error("Invalid id");
-	}
-	const map = await MapRepository.get();
-	const newItem = createNewItem(description, id);
-	const newMap = addNewItem(parentId, map, newItem);
-	await MapRepository.save(newMap);
-	return null;
-}
-
-export function AddItemCardButton(props: {
+export function AddItemButton(props: {
 	parent: Item;
 	className?: string;
+	onAddItem: (parentId: string, addedParent: Item) => void;
+	onMoveItem: (
+		movedItemId: string,
+		targetParentId: string,
+		targetSiblingIndex: number,
+	) => void;
 }) {
 	const [writing, setWriting] = React.useState(false);
 	const fetcher = useFetcher();
@@ -40,6 +23,7 @@ export function AddItemCardButton(props: {
 		props.parent,
 		props.parent.children.length,
 		() => "before",
+		props.onMoveItem,
 	);
 	return (
 		<div
@@ -71,17 +55,15 @@ export function AddItemCardButton(props: {
 						focusVisibleStyle,
 					)}
 					onBlur={(e) => {
-						if (e.target.value.trim() === "") {
-							setWriting(false);
-							return;
+						if (e.target.value.trim() !== "") {
+							props.onAddItem(props.parent.id, {
+								...props.parent,
+								children: [
+									...props.parent.children,
+									createNewItem(e.target.value),
+								],
+							});
 						}
-						const newItem = createNewItem(e.target.value);
-						fetcher.submit(newItem, {
-							method: "post",
-							action: `/add-item/${props.parent.id}`,
-						});
-						// XXX: mutate parent's state from a child.
-						props.parent.children.push(newItem);
 						setWriting(false);
 					}}
 				/>

@@ -1,7 +1,7 @@
 import type { Item } from "~/map/models";
 import { createNewItem } from "../lifecycle";
 
-export function parseMarkdownToMap(markdown: string): Item {
+export function parseMarkdownToItem(markdown: string): Item {
 	const lines = markdown.split("\n").filter((line) => line.trim() !== "");
 	const rootItems: Item[] = [];
 	const stack: { item: Item; level: number }[] = [];
@@ -32,20 +32,25 @@ export function parseMarkdownToMap(markdown: string): Item {
 	} as Item;
 }
 
-function serializeItemToMarkdown(item: Item, level: number): string {
-	const indent = "  ".repeat(level);
-	const children = item.children
-		.map((child) => serializeItemToMarkdown(child, level + 1))
+function serializeChildToMarkdown(item: Item, level: number): string {
+	const indent = "    ".repeat(level);
+	const currentLine = `${indent}- ${item.description}`;
+	const childrenMarkdown = item.children
+		.map((child) => serializeChildToMarkdown(child, level + 1))
 		.join("\n");
-	return `${indent}- ${item.description}${children ? `\n${children}` : ""}`;
+	return childrenMarkdown ? `${currentLine}\n${childrenMarkdown}` : currentLine;
 }
 
-export function serializeMapToMarkdown(map: Item): string {
-	return serializeItemToMarkdown(map, 0)
-		.split("\n")
-		.slice(1)
-		.map((line) => (line.startsWith("  ") ? line.slice(2) : line))
-		.join("\n");
+export function serializeItemToMarkdown(map: Item): string {
+	const isRoot = map.id === "__root";
+	const serial = serializeChildToMarkdown(map, 0);
+	return !isRoot
+		? serial
+		: serial
+				.split("\n")
+				.slice(1)
+				.map((line) => (line.startsWith("    ") ? line.slice(4) : line))
+				.join("\n");
 }
 
 export function updateItem(
@@ -63,7 +68,6 @@ export function updateItem(
 
 /**
  * Adds a new item as a child of the item with the given ID.
- * if no ID is provided, the item is added as a root item.
  */
 export function addNewItem(
 	parentId: string,
