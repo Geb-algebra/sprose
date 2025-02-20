@@ -30,7 +30,7 @@ export function ItemCard(props: {
 	const onDragStart = useStartCardInsert(item);
 
 	return (
-		<div className={cn(styles.childLayout, props.className)}>
+		<div className={cn(styles.layout, props.className)}>
 			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
 				{editing ? (
 					<BlurOnEnterTextArea
