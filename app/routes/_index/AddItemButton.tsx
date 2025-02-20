@@ -2,6 +2,7 @@ import React from "react";
 import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useAcceptCardInsert } from "~/map/hooks/useCardInsert";
+import { createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { cardShape, cn, focusVisibleStyle, inserterShape } from "~/utils/css";
 import styles from "./AddItemButton.module.css";
@@ -9,7 +10,7 @@ import styles from "./AddItemButton.module.css";
 export function AddItemButton(props: {
 	parent: Item;
 	className?: string;
-	onAddItem: (parentId: string, description: string) => void;
+	onAddItem: (parentId: string, addedParent: Item) => void;
 	onMoveItem: (
 		movedItemId: string,
 		targetParentId: string,
@@ -55,7 +56,13 @@ export function AddItemButton(props: {
 					)}
 					onBlur={(e) => {
 						if (e.target.value.trim() !== "") {
-							props.onAddItem(props.parent.id, e.target.value);
+							props.onAddItem(props.parent.id, {
+								...props.parent,
+								children: [
+									...props.parent.children,
+									createNewItem(e.target.value),
+								],
+							});
 						}
 						setWriting(false);
 					}}

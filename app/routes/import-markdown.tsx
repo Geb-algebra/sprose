@@ -3,7 +3,7 @@ import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import { TooltipButton } from "~/components/TooltipButton";
 import { MapRepository } from "~/map/lifecycle";
-import { parseMarkdownToMap } from "~/map/services";
+import { parseMarkdownToItem } from "~/map/services";
 import type { Route } from "./+types/import-markdown";
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
@@ -13,7 +13,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 		return { error: "Invalid file input, expected a File." };
 	}
 	const fileText = await markdownFile.text();
-	await MapRepository.save(parseMarkdownToMap(fileText));
+	await MapRepository.save(parseMarkdownToItem(fileText));
 	return { success: true };
 }
 
