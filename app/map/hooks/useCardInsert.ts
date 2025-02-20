@@ -6,15 +6,12 @@ import { isItem } from "../services";
 const cardType = "application/item-card";
 type InsertAt = "none" | "before" | "after";
 
-export function useStartCardInsert(parent: Item, siblingIndex: number) {
-	const item = parent.children[siblingIndex];
-
+export function useStartCardInsert(item: Item) {
 	function onDragStart(e: React.DragEvent) {
 		e.stopPropagation();
 		e.dataTransfer.effectAllowed = "move";
 		e.dataTransfer.setData(cardType, JSON.stringify(item));
 	}
-
 	return onDragStart;
 }
 
@@ -27,13 +24,12 @@ export function useAcceptCardInsert(
 		clientY: number;
 		insertAt: InsertAt;
 	}) => InsertAt,
-	onMoveItem: (
+	moveItem: (
 		movedItemId: string,
 		targetParentId: string,
 		targetSiblingIndex: number,
 	) => void,
 ) {
-	const item = parent.children[siblingIndex];
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
 
 	function onDragOver(e: React.DragEvent) {
@@ -62,7 +58,7 @@ export function useAcceptCardInsert(
 		if (!isItem(item)) {
 			throw new Error("Invalid item");
 		}
-		onMoveItem(
+		moveItem(
 			item.id,
 			parent.id,
 			insertAt === "before" ? siblingIndex : siblingIndex + 1,

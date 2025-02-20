@@ -1,5 +1,4 @@
 import type { Item } from "~/map/models";
-import { createNewItem } from "../lifecycle";
 
 export function updateItem(
 	items: Item,

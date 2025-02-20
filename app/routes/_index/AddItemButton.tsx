@@ -10,20 +10,19 @@ import styles from "./AddItemButton.module.css";
 export function AddItemButton(props: {
 	parent: Item;
 	className?: string;
-	onAddItem: (parentId: string, addedParent: Item) => void;
-	onMoveItem: (
+	addItem: (item: Item) => void;
+	moveItem: (
 		movedItemId: string,
 		targetParentId: string,
 		targetSiblingIndex: number,
 	) => void;
 }) {
 	const [writing, setWriting] = React.useState(false);
-	const fetcher = useFetcher();
 	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
 		props.parent,
 		props.parent.children.length,
 		() => "before",
-		props.onMoveItem,
+		props.moveItem,
 	);
 	return (
 		<div
@@ -56,13 +55,7 @@ export function AddItemButton(props: {
 					)}
 					onBlur={(e) => {
 						if (e.target.value.trim() !== "") {
-							props.onAddItem(props.parent.id, {
-								...props.parent,
-								children: [
-									...props.parent.children,
-									createNewItem(e.target.value),
-								],
-							});
+							props.addItem(createNewItem(e.target.value));
 						}
 						setWriting(false);
 					}}

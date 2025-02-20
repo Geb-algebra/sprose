@@ -1,9 +1,10 @@
 import React from "react";
+import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import { useStartCardInsert } from "~/map/hooks/useCardInsert";
 import type { Item } from "~/map/models";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
-import styles from "./Item.module.css";
+import styles from "./item.module.css";
 
 function PseudoCard(props: { className?: string }) {
 	return (
@@ -12,19 +13,24 @@ function PseudoCard(props: { className?: string }) {
 }
 
 export function ItemCard(props: {
-	parent: Item;
-	siblingIndex: number;
+	item: Item;
 	asParent: boolean;
 	className?: string;
-	onUpdateItemText: (itemId: string, description: string) => void;
-	onDeleteItem: (itemId: string) => void;
 }) {
-	const item = props.parent.children[props.siblingIndex];
+	const fetcher = useFetcher();
+	function submitJson(map: Item, method: "PUT" | "DELETE") {
+		fetcher.submit(map, {
+			method,
+			encType: "application/json",
+		});
+	}
+	// activate after introducing zod for isItem
+	// const item = isItem(fetcher.json) ?? props.item;
 	const [editing, setEditing] = React.useState(false);
-	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
+	const onDragStart = useStartCardInsert(props.item);
 
 	return (
-		<div className={cn(styles.layout, props.className)}>
+		<div className={cn(styles.childLayout, props.className)}>
 			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
 				{editing ? (
 					<BlurOnEnterTextArea
@@ -34,12 +40,15 @@ export function ItemCard(props: {
 							cardShape,
 							props.asParent ? "bg-transparent shadow-none border-none" : "",
 						)}
-						defaultValue={item.description}
+						defaultValue={props.item.description}
 						onBlur={(e) => {
 							if (e.target.value.trim() !== "") {
-								props.onUpdateItemText(item.id, e.target.value);
+								submitJson(
+									{ ...props.item, description: e.target.value },
+									"PUT",
+								);
 							} else {
-								props.onDeleteItem(item.id);
+								submitJson(props.item, "DELETE");
 							}
 							setEditing(false);
 						}}
@@ -59,7 +68,7 @@ export function ItemCard(props: {
 						draggable={!props.asParent}
 						onDragStart={onDragStart}
 					>
-						{item.description.split("\n").map((line, i) => (
+						{props.item.description.split("\n").map((line, i) => (
 							<p key={String(i) + line}>{line}</p>
 						))}
 					</button>

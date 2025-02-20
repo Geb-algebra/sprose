@@ -14,7 +14,7 @@ export function TooltipButton(
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Tooltip>
-				<TooltipTrigger>
+				<TooltipTrigger asChild>
 					<Button {...props} />
 				</TooltipTrigger>
 				<TooltipContent>{props.tooltip}</TooltipContent>
