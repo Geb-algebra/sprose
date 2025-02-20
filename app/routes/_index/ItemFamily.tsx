@@ -1,4 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import {
 	ContextMenu,
@@ -10,13 +11,13 @@ import {
 	useAcceptCardInsert,
 	useStartCardInsert,
 } from "~/map/hooks/useCardInsert";
-import type { Item } from "~/map/models";
+import { type Item, itemSchema } from "~/map/models";
 import {
 	copyItemToClipboard,
 	getChildFromClipboard,
 } from "~/map/services/clipboard.client";
-import { AddItemButton } from "~/routes/_index/AddItemButton";
 import { cn, inserterShape } from "~/utils/css";
+import { AddItemButton } from "./AddItemButton";
 import { ItemCard } from "./Item";
 import styles from "./ItemFamily.module.css";
 
@@ -24,17 +25,24 @@ export function ItemFamily(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
-	onAddItem: (parentId: string, itemAfterAdd: Item) => void;
-	onMoveItem: (
+	moveItem: (
 		movedItemId: string,
 		targetParentId: string,
 		targetSiblingIndex: number,
 	) => void;
-	onUpdateItemText: (itemId: string, description: string) => void;
-	onDeleteItem: (itemId: string) => void;
-	onToggleExpand: (itemId: string) => void;
 }) {
-	const onDragStart = useStartCardInsert(props.parent, props.siblingIndex);
+	const fetcher = useFetcher();
+	function submitJson(newItem: Item, method: "PUT" | "DELETE") {
+		fetcher.submit(newItem, {
+			method,
+			encType: "application/json",
+		});
+	}
+	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
+	const item = possiblyNewItem.success
+		? possiblyNewItem.data
+		: props.parent.children[props.siblingIndex];
+	const onDragStart = useStartCardInsert(item);
 	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
 		props.parent,
 		props.siblingIndex,
@@ -66,10 +74,8 @@ export function ItemFamily(props: {
 			}
 			return clientY <= midpoint ? "before" : "after";
 		},
-		props.onMoveItem,
+		props.moveItem,
 	);
-
-	const item = props.parent.children[props.siblingIndex];
 
 	return (
 		<ContextMenu>
@@ -81,13 +87,7 @@ export function ItemFamily(props: {
 			>
 				<ContextMenuTrigger className={styles.family}>
 					{!props.parent.isExpanded ? (
-						<ItemCard
-							asParent={false}
-							parent={props.parent}
-							siblingIndex={props.siblingIndex}
-							onUpdateItemText={props.onUpdateItemText}
-							onDeleteItem={props.onDeleteItem}
-						/>
+						<ItemCard asParent={false} item={item} />
 					) : (
 						<div
 							className={cn(
@@ -105,31 +105,26 @@ export function ItemFamily(props: {
 									styles.content,
 								)}
 							>
-								<ItemCard
-									asParent
-									parent={props.parent}
-									siblingIndex={props.siblingIndex}
-									onUpdateItemText={props.onUpdateItemText}
-									onDeleteItem={props.onDeleteItem}
-								/>
+								<ItemCard asParent item={item} />
 								{item.children.map((child, siblingIndex) => (
 									<ItemFamily
 										key={child.id}
 										parent={item}
 										siblingIndex={siblingIndex}
 										className={item.isExpanded ? "row-start-2" : ""}
-										onAddItem={props.onAddItem}
-										onMoveItem={props.onMoveItem}
-										onUpdateItemText={props.onUpdateItemText}
-										onDeleteItem={props.onDeleteItem}
-										onToggleExpand={props.onToggleExpand}
+										moveItem={props.moveItem}
 									/>
 								))}
 								<AddItemButton
 									parent={item}
 									className={item.isExpanded ? "row-start-2" : ""}
-									onAddItem={props.onAddItem}
-									onMoveItem={props.onMoveItem}
+									addItem={(addedChild: Item) => {
+										submitJson(
+											{ ...item, children: [...item.children, addedChild] },
+											"PUT",
+										);
+									}}
+									moveItem={props.moveItem}
 								/>
 							</div>
 							<Button
@@ -141,7 +136,9 @@ export function ItemFamily(props: {
 									"w-4 h-20 ml-auto",
 									item.children.length === 0 && "hidden",
 								)}
-								onClick={() => props.onToggleExpand(item.id)}
+								onClick={() =>
+									submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")
+								}
 							>
 								{item.isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 							</Button>
@@ -173,12 +170,11 @@ export function ItemFamily(props: {
 				<ContextMenuItem
 					onClick={async () => {
 						const newChildren = await getChildFromClipboard();
-						console.log(newChildren);
 						if (newChildren) {
-							props.onAddItem(item.id, {
-								...item,
-								children: [...item.children, ...newChildren],
-							});
+							submitJson(
+								{ ...item, children: [...item.children, ...newChildren] },
+								"PUT",
+							);
 						}
 					}}
 				>
@@ -186,7 +182,7 @@ export function ItemFamily(props: {
 				</ContextMenuItem>
 				<ContextMenuItem
 					className="text-destructive focus:bg-destructive-foreground"
-					onClick={() => props.onDeleteItem(item.id)}
+					onClick={() => submitJson(item, "DELETE")}
 				>
 					Delete
 				</ContextMenuItem>

@@ -1,16 +1,25 @@
 .layout {
 	display: grid;
-	grid-template-columns: 1fr;
-	grid-template-rows: auto auto auto;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto 1fr auto;
 	gap: 0;
 	grid-template-areas:
-		"insert-top"
-		"content"
-		"insert-bottom";
+		".           insert-top    .           "
+		"insert-left family        insert-right"
+		".           insert-bottom .           ";
+	align-items: start;
 }
 
-.content {
-	grid-area: content;
+.insertLeft {
+	grid-area: insert-left;
+}
+
+.family {
+	grid-area: family;
+}
+
+.insertRight {
+	grid-area: insert-right;
 }
 
 .insertTop {
@@ -19,4 +28,46 @@
 
 .insertBottom {
 	grid-area: insert-bottom;
+}
+
+.familyLayout {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-rows: 1fr;
+	gap: 0;
+	width: fit-content;
+	grid-template-areas: "content expand";
+}
+
+.content {
+	grid-area: content;
+}
+
+.expand {
+	grid-area: expand;
+}
+
+.collapsedLayout {
+	display: grid;
+	gap: 0px;
+	align-items: start;
+	grid-auto-flow: row;
+}
+
+.expandedLayout {
+	display: grid;
+	gap: 0px;
+	justify-items: start;
+	grid-auto-flow: column;
+}
+
+.childLayout {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: auto auto auto;
+	gap: 0;
+	grid-template-areas:
+		"insert-top"
+		"content"
+		"insert-bottom";
 }

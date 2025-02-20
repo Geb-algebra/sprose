@@ -10,78 +10,48 @@ import {
 } from "~/components/ContextMenu";
 import Logo from "~/components/Logo";
 import { MapRepository } from "~/map/lifecycle";
-import type { Item } from "~/map/models";
-import {
-	deleteItem,
-	findChildById,
-	isItem,
-	moveItem,
-	updateItem,
-} from "~/map/services";
+import { type Item, itemSchema } from "~/map/models";
+import { deleteItem, moveItem, updateItem } from "~/map/services";
 import {
 	copyItemToClipboard,
 	getChildFromClipboard,
 } from "~/map/services/clipboard.client";
-import { ItemFamily } from "~/routes/_index/ItemFamily";
 import { Control } from "~/routes/control";
 import type { Route } from "./+types/route";
 import { AddItemButton } from "./AddItemButton";
+import { ItemFamily } from "./ItemFamily";
 
 export async function clientLoader() {
 	return await MapRepository.get();
 }
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
-	const newMap = await request.json();
-	if (!isItem(newMap)) {
-		throw new Error("Invalid map");
+	const newItem = itemSchema.parse(await request.json());
+	const map = await MapRepository.get();
+	let newMap: Item;
+	if (request.method === "DELETE") {
+		if (newItem.id === map.id) {
+			throw new Error("Cannot delete root item");
+		}
+		newMap = deleteItem(newItem.id, map);
+	} else if (request.method === "PUT") {
+		newMap = updateItem(map, newItem);
+	} else {
+		throw new Error("Invalid method");
 	}
 	await MapRepository.save(newMap);
 	return null;
 }
 
-export default function Page({ loaderData: map }: Route.ComponentProps) {
+export default function Page({ loaderData }: Route.ComponentProps) {
 	const fetcher = useFetcher();
-
+	const possiblyNewMap = itemSchema.safeParse(fetcher.json);
+	const map = possiblyNewMap.success ? possiblyNewMap.data : loaderData;
 	function submitJson(map: Item) {
 		fetcher.submit(map, {
-			method: "POST",
+			method: "PUT",
 			encType: "application/json",
 		});
-	}
-
-	function onAddItem(parentId: string, itemAfterAdd: Item) {
-		const parent = findChildById(map, parentId);
-		if (!parent) {
-			return;
-		}
-		parent.children = itemAfterAdd.children;
-		submitJson(map);
-	}
-
-	function onMoveItem(
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) {
-		submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
-	}
-
-	function onUpdateItemText(itemId: string, description: string) {
-		submitJson(updateItem(map, { id: itemId, description }));
-	}
-
-	function onDeleteItem(itemId: string) {
-		submitJson(deleteItem(itemId, map));
-	}
-
-	function onToggleExpand(itemId: string) {
-		const item = findChildById(map, itemId);
-		if (!item) {
-			return;
-		}
-		item.isExpanded = !item.isExpanded;
-		submitJson(map);
 	}
 
 	return (
@@ -110,17 +80,44 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 								key={item.id}
 								parent={map}
 								siblingIndex={siblingIndex}
-								onAddItem={onAddItem}
-								onMoveItem={onMoveItem}
-								onUpdateItemText={onUpdateItemText}
-								onDeleteItem={onDeleteItem}
-								onToggleExpand={onToggleExpand}
+								moveItem={(
+									movedItemId: string,
+									targetParentId: string,
+									targetSiblingIndex: number,
+								) => {
+									submitJson(
+										moveItem(
+											movedItemId,
+											targetParentId,
+											targetSiblingIndex,
+											map,
+										),
+									);
+								}}
 							/>
 						))}
 						<AddItemButton
 							parent={map}
-							onAddItem={onAddItem}
-							onMoveItem={onMoveItem}
+							addItem={(addedChild: Item) => {
+								submitJson({
+									...map,
+									children: [...map.children, addedChild],
+								});
+							}}
+							moveItem={(
+								movedItemId: string,
+								targetParentId: string,
+								targetSiblingIndex: number,
+							) => {
+								submitJson(
+									moveItem(
+										movedItemId,
+										targetParentId,
+										targetSiblingIndex,
+										map,
+									),
+								);
+							}}
 						/>
 					</main>
 				</ContextMenuTrigger>
@@ -132,7 +129,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 						onClick={async () => {
 							const newChildren = await getChildFromClipboard();
 							if (newChildren) {
-								onAddItem(map.id, {
+								submitJson({
 									...map,
 									children: [...map.children, ...newChildren],
 								});
@@ -144,8 +141,7 @@ export default function Page({ loaderData: map }: Route.ComponentProps) {
 					<ContextMenuItem
 						className="text-destructive focus:bg-destructive-foreground"
 						onClick={() => {
-							map.children = [];
-							submitJson(map);
+							submitJson({ ...map, children: [] });
 						}}
 					>
 						Delete All Items

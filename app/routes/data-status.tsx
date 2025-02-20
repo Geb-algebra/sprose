@@ -9,8 +9,7 @@ import React from "react";
 import { useFetcher } from "react-router";
 import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
 import { MapRepository } from "~/map/lifecycle";
-import type { Item } from "~/map/models";
-import { isItem } from "~/map/services";
+import { type Item, itemSchema } from "~/map/models";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/data-status";
 import styles from "./data-status.module.css";
@@ -22,10 +21,7 @@ export async function clientLoader() {
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	// await new Promise((resolve) => setTimeout(resolve, 500));
-	const item = await request.json();
-	if (!isItem(item)) {
-		throw new Error("Invalid item");
-	}
+	const item = itemSchema.parse(await request.json());
 	return await MapRepository.save(item);
 }
 
