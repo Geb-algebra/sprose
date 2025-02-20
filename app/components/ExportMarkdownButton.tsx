@@ -1,5 +1,4 @@
 import { DownloadIcon } from "lucide-react";
-import { Button } from "~/components/Button";
 import { MapRepository } from "~/map/lifecycle";
 import { serializeItemToMarkdown } from "~/map/services";
 import { TooltipButton } from "./TooltipButton";
