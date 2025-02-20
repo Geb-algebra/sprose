@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Item } from "~/map/models";
-import {
-	addNewItem,
-	deleteItem,
-	findParentByChildId,
-	moveItem,
-	updateItem,
-} from "./index";
+import { addNewItem, deleteItem, findParentByChildId, moveItem, updateItem } from "./index";
 import { _expectedItem, _item, _rootItem } from "./test-utils";
 
 describe("updateItemDescription", () => {
@@ -42,10 +36,7 @@ describe("updateItemDescription", () => {
 				children: [
 					_item({
 						description: "Item 2",
-						children: [
-							_item({ description: "Item 5" }),
-							_item({ id: "6", description: "Item 6" }),
-						],
+						children: [_item({ description: "Item 5" }), _item({ id: "6", description: "Item 6" })],
 					}),
 				],
 			}),
@@ -156,11 +147,7 @@ describe("addNewItem", () => {
 
 describe("moveItem", () => {
 	it("should move a root item before another item", () => {
-		const map = _rootItem([
-			_item({ id: "1" }),
-			_item({ id: "2" }),
-			_item({ id: "3" }),
-		]);
+		const map = _rootItem([_item({ id: "1" }), _item({ id: "2" }), _item({ id: "3" })]);
 
 		const newMap = moveItem("2", "__root", 0, map);
 		expect(newMap).toEqual(
@@ -228,10 +215,7 @@ describe("moveItem", () => {
 					children: [
 						_expectedItem({
 							id: "2",
-							children: [
-								_expectedItem({ id: "5" }),
-								_expectedItem({ id: "6" }),
-							],
+							children: [_expectedItem({ id: "5" }), _expectedItem({ id: "6" })],
 						}),
 						_expectedItem({ id: "3" }),
 					],
@@ -262,16 +246,10 @@ describe("moveItem", () => {
 
 describe("deleteItem", () => {
 	it("should delete a root item", () => {
-		const map = _rootItem([
-			_item({ id: "1" }),
-			_item({ id: "2" }),
-			_item({ id: "3" }),
-		]);
+		const map = _rootItem([_item({ id: "1" }), _item({ id: "2" }), _item({ id: "3" })]);
 		const newMap = deleteItem("2", map);
 
-		expect(newMap).toEqual(
-			_rootItem([_expectedItem({ id: "1" }), _expectedItem({ id: "3" })]),
-		);
+		expect(newMap).toEqual(_rootItem([_expectedItem({ id: "1" }), _expectedItem({ id: "3" })]));
 	});
 
 	it("should delete a child", () => {

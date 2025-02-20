@@ -20,12 +20,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 export function Control(props: { className?: string }) {
 	const fetcher = useFetcher();
 	return (
-		<div
-			className={cn(
-				props.className,
-				"flex bg-card shadow-sm rounded-lg w-fit p-1",
-			)}
-		>
+		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>
 			<fetcher.Form action="/control" method="post" className="flex w-fit">
 				<TooltipButton
 					type="submit"

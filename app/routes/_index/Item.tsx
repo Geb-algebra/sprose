@@ -7,9 +7,7 @@ import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 import styles from "./item.module.css";
 
 function PseudoCard(props: { className?: string }) {
-	return (
-		<div className={cn(props.className, "shadow-sm bg-card p-2", cardShape)} />
-	);
+	return <div className={cn(props.className, "shadow-sm bg-card p-2", cardShape)} />;
 }
 
 export function ItemCard(props: {
@@ -30,7 +28,7 @@ export function ItemCard(props: {
 	const onDragStart = useStartCardInsert(item);
 
 	return (
-		<div className={cn(styles.childLayout, props.className)}>
+		<div className={cn(styles.layout, props.className)}>
 			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
 				{editing ? (
 					<BlurOnEnterTextArea

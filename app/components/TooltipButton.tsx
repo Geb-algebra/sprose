@@ -1,10 +1,5 @@
 import { Button } from "./Button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "./Tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./Tooltip";
 
 export function TooltipButton(
 	props: React.ComponentProps<typeof Button> & {

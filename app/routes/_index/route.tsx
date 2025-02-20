@@ -12,10 +12,7 @@ import Logo from "~/components/Logo";
 import { MapRepository } from "~/map/lifecycle";
 import { type Item, itemSchema } from "~/map/models";
 import { deleteItem, moveItem, updateItem } from "~/map/services";
-import {
-	copyItemToClipboard,
-	getChildFromClipboard,
-} from "~/map/services/clipboard.client";
+import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
 import { Control } from "~/routes/control";
 import type { Route } from "./+types/route";
 import { AddItemButton } from "./AddItemButton";
@@ -85,14 +82,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 									targetParentId: string,
 									targetSiblingIndex: number,
 								) => {
-									submitJson(
-										moveItem(
-											movedItemId,
-											targetParentId,
-											targetSiblingIndex,
-											map,
-										),
-									);
+									submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
 								}}
 							/>
 						))}
@@ -109,14 +99,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 								targetParentId: string,
 								targetSiblingIndex: number,
 							) => {
-								submitJson(
-									moveItem(
-										movedItemId,
-										targetParentId,
-										targetSiblingIndex,
-										map,
-									),
-								);
+								submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
 							}}
 						/>
 					</main>

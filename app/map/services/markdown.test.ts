@@ -46,10 +46,7 @@ describe("serializeMapToMarkdown", () => {
 			_rootItem([
 				_item({
 					description: "Item 1",
-					children: [
-						_item({ description: "Item 3" }),
-						_item({ description: "Item 4" }),
-					],
+					children: [_item({ description: "Item 3" }), _item({ description: "Item 4" })],
 				}),
 				_item({ description: "Item 2" }),
 			]),
