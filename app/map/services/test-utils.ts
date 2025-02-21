@@ -10,7 +10,7 @@ export const _item = (item: Partial<Item>) => ({
 });
 
 export const _expectedItem = (item: Partial<Item>) => ({
-	id: expect.any(String),
+	id: item.id ?? expect.any(String),
 	description: item.description ?? expect.any(String),
 	isExpanded: item.isExpanded ?? expect.any(Boolean),
 	children: item.children ?? expect.any(Array),

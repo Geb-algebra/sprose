@@ -49,7 +49,16 @@ export function useAcceptCardInsert(
 		e.stopPropagation();
 		const data = e.dataTransfer.getData("application/item-card");
 		const item = itemSchema.parse(JSON.parse(data));
-		moveItem(item.id, parent.id, insertAt === "before" ? siblingIndex : siblingIndex + 1);
+		const siblingIndexAfterItemLeft =
+			parent.children.some((c) => c.id === item.id) &&
+			parent.children.findIndex((child) => child.id === item.id) < siblingIndex
+				? siblingIndex - 1
+				: siblingIndex;
+		moveItem(
+			item.id,
+			parent.id,
+			insertAt === "before" ? siblingIndexAfterItemLeft : siblingIndexAfterItemLeft + 1,
+		);
 		setInsertAt("none");
 	}
 
