@@ -10,7 +10,6 @@ export function BlurOnEnterTextArea(props: {
 	return (
 		<textarea
 			className={props.className}
-			// optimistic description update
 			defaultValue={props.defaultValue}
 			onBlur={props.onBlur}
 			onCompositionStart={() => setIsComposing(true)}

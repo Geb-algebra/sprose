@@ -39,30 +39,17 @@ export function ItemFamily(props: {
 		(params) => {
 			const { rect, clientX, clientY, insertAt } = params;
 			let midpoint: number;
-			if (props.parent.isExpanded) {
-				switch (insertAt) {
-					case "before":
-						midpoint = rect.left + (rect.width - 32) / 2 + 32;
-						break;
-					case "after":
-						midpoint = rect.left + (rect.width - 32) / 2 + 32;
-						break;
-					default:
-						midpoint = rect.left + rect.width / 2;
-				}
-				return clientX <= midpoint ? "before" : "after";
+			const base = props.parent.isExpanded ? rect.left : rect.top;
+			const size = props.parent.isExpanded ? rect.width : rect.height;
+			const place = props.parent.isExpanded ? clientX : clientY;
+			if (insertAt === "before") {
+				midpoint = base + (size - 32) / 2 + 32;
+			} else if (insertAt === "after") {
+				midpoint = base + (size - 32) / 2;
+			} else {
+				midpoint = base + size / 2;
 			}
-			switch (insertAt) {
-				case "before":
-					midpoint = rect.top + (rect.height / 4) * 3;
-					break;
-				case "after":
-					midpoint = rect.top + rect.height / 4;
-					break;
-				default:
-					midpoint = rect.top + rect.height / 2;
-			}
-			return clientY <= midpoint ? "before" : "after";
+			return place <= midpoint ? "before" : "after";
 		},
 		props.moveItem,
 	);
