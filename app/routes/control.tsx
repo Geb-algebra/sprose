@@ -1,11 +1,9 @@
 import { RedoIcon, UndoIcon } from "lucide-react";
-import { Form, useFetcher } from "react-router";
-import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
+import { useFetcher } from "react-router";
 import { TooltipButton } from "~/components/TooltipButton";
 import { MapRepository } from "~/map/lifecycle";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/control";
-import { ImportMarkdownButton } from "./import-markdown";
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
@@ -43,8 +41,6 @@ export function Control(props: { className?: string }) {
 					<RedoIcon size={24} />
 				</TooltipButton>
 			</fetcher.Form>
-			<ImportMarkdownButton />
-			<ExportMarkdownButton />
 		</div>
 	);
 }
