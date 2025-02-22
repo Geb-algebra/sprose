@@ -2,8 +2,12 @@ import { RedoIcon, UndoIcon } from "lucide-react";
 import { useFetcher } from "react-router";
 import { TooltipButton } from "~/components/TooltipButton";
 import { MapRepository } from "~/map/lifecycle";
+import type { Item } from "~/map/models";
 import { cn } from "~/utils/css";
-import type { Route } from "./+types/control";
+import type { Route } from "./+types/route";
+import ClipboardCopy from "./ClipboardCopy";
+import ClipboardPaste from "./ClipboardPaste";
+import Delete from "./Delete";
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
@@ -15,7 +19,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	}
 }
 
-export function Control(props: { className?: string }) {
+export function Control(props: { map: Item; className?: string }) {
 	const fetcher = useFetcher();
 	return (
 		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>
@@ -28,7 +32,7 @@ export function Control(props: { className?: string }) {
 					value="undo"
 					tooltip="Undo"
 				>
-					<UndoIcon size={24} />
+					<UndoIcon />
 				</TooltipButton>
 				<TooltipButton
 					type="submit"
@@ -38,9 +42,12 @@ export function Control(props: { className?: string }) {
 					value="redo"
 					tooltip="Redo"
 				>
-					<RedoIcon size={24} />
+					<RedoIcon />
 				</TooltipButton>
 			</fetcher.Form>
+			<ClipboardCopy map={props.map} />
+			<ClipboardPaste map={props.map} />
+			<Delete map={props.map} />
 		</div>
 	);
 }
