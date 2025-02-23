@@ -10,37 +10,51 @@
 	align-items: start;
 }
 
-.insertLeft {
-	grid-area: insert-left;
-}
-
 .family {
 	grid-area: family;
 }
 
+.insertLeft {
+	grid-area: insert-left;
+	margin-right: 16px;
+}
+
 .insertRight {
 	grid-area: insert-right;
+	margin-left: 16px;
 }
 
 .insertTop {
 	grid-area: insert-top;
+	margin-bottom: 8px;
 }
 
 .insertBottom {
 	grid-area: insert-bottom;
+	margin-top: 8px;
 }
 
 .familyLayout {
 	display: grid;
-	grid-template-columns: 1fr auto;
-	grid-template-rows: 1fr;
-	gap: 0;
+	grid-template-columns: 1fr;
+	grid-template-rows: auto 1fr;
+	gap: 0px 16px;
+	grid-template-areas:
+		"header"
+		"children";
 	width: fit-content;
-	grid-template-areas: "content expand";
 }
 
-.content {
-	grid-area: content;
+.header {
+	grid-area: header;
+}
+
+.children {
+	grid-area: children;
+}
+
+.self {
+	grid-area: self;
 }
 
 .expand {
@@ -49,14 +63,14 @@
 
 .collapsedLayout {
 	display: grid;
-	gap: 0px;
+	gap: 8px 16px;
 	align-items: start;
 	grid-auto-flow: row;
 }
 
 .expandedLayout {
 	display: grid;
-	gap: 0px;
+	gap: 8px 16px;
 	justify-items: start;
 	grid-auto-flow: column;
 }

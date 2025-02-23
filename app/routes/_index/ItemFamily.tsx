@@ -66,56 +66,58 @@ export function ItemFamily(props: {
 					{!props.parent.isExpanded ? (
 						<ItemCard asParent={false} item={item} />
 					) : (
-						<div
-							className={cn("bg-card rounded-lg shadow-sm border mr-2 mb-2", styles.familyLayout)}
-							draggable
-							onDragStart={onDragStart}
-						>
+						<div className={styles.familyLayout} draggable onDragStart={onDragStart}>
+							<div
+								className={cn(
+									styles.header,
+									"bg-card h-[120%] w-full flex rounded-t-lg border shadow-sm items-start",
+								)}
+							>
+								<ItemCard asParent item={item} className={cn(styles.self, "relative z-10")} />
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className={cn(styles.expand, "w-4 h-20 ml-auto")}
+									disabled={item.children.length === 0}
+									onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
+								>
+									{item.children.length === 0 ? null : item.isExpanded ? (
+										<ChevronLeftIcon />
+									) : (
+										<ChevronRightIcon />
+									)}
+								</Button>
+							</div>
 							<div
 								className={cn(
 									item.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
-									styles.content,
+									styles.children,
+									"p-2 rounded-xl border-x border-t inset-shadow-xs bg-background",
 								)}
 							>
-								<ItemCard asParent item={item} />
 								{item.children.map((child, siblingIndex) => (
 									<ItemFamily
 										key={child.id}
 										parent={item}
 										siblingIndex={siblingIndex}
-										className={item.isExpanded ? "row-start-2" : ""}
 										moveItem={props.moveItem}
 									/>
 								))}
 								<AddItemButton
 									parent={item}
-									className={item.isExpanded ? "row-start-2" : ""}
 									addItem={(addedChild: Item) => {
 										submitJson({ ...item, children: [...item.children, addedChild] }, "PUT");
 									}}
 									moveItem={props.moveItem}
 								/>
 							</div>
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								className={cn(
-									styles.expand,
-									"w-4 h-20 ml-auto",
-									item.children.length === 0 && "hidden",
-								)}
-								onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
-							>
-								{item.isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-							</Button>
 						</div>
 					)}
 				</ContextMenuTrigger>
 				<div
 					className={cn(
 						inserterShape(props.parent.isExpanded),
-						"pr-2 pb-2",
 						insertAt === "none"
 							? "hidden"
 							: props.parent.isExpanded
@@ -125,10 +127,9 @@ export function ItemFamily(props: {
 								: insertAt === "before"
 									? styles.insertTop
 									: styles.insertBottom,
+						"bg-secondary rounded-lg",
 					)}
-				>
-					<div className={cn("bg-secondary w-full h-full rounded-lg")} />
-				</div>
+				/>
 			</div>
 			<ContextMenuContent className="w-64">
 				<ContextMenuItem onClick={() => copyItemToClipboard(item)}>

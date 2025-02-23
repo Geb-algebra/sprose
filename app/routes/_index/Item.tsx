@@ -25,48 +25,47 @@ export function ItemCard(props: {
 
 	return (
 		<div className={cn(styles.layout, props.className)}>
-			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
-				{editing ? (
-					<BlurOnEnterTextArea
-						className={cn(
-							focusVisibleStyle,
-							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2 resize-none",
-							cardShape,
-							!props.asParent && props.item.children.length > 0 ? "border-b-3 border-r-3" : "",
-							props.asParent ? "bg-transparent shadow-none border-none" : "",
-						)}
-						defaultValue={item.description}
-						onBlur={(e) => {
-							if (e.target.value.trim() !== "") {
-								submitJson({ ...item, description: e.target.value }, "PUT");
-							} else {
-								submitJson(item, "DELETE");
-							}
-							setEditing(false);
-						}}
-					/>
-				) : (
-					<button
-						type="button"
-						className={cn(
-							styles.content,
-							focusVisibleStyle,
-							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2",
-							cardShape,
-							!props.asParent && props.item.children.length > 0 ? "border-b-3 border-r-3" : "",
-							"grid place-content-start text-start",
-							props.asParent ? "bg-transparent shadow-none border-none" : "",
-						)}
-						onClick={() => setEditing(true)}
-						draggable={!props.asParent}
-						onDragStart={onDragStart}
-					>
-						{item.description.split("\n").map((line, i) => (
-							<p key={String(i) + line}>{line}</p>
-						))}
-					</button>
-				)}
-			</div>
+			{editing ? (
+				<BlurOnEnterTextArea
+					className={cn(
+						styles.content,
+						focusVisibleStyle,
+						"bg-card p-2 shadow-sm border text-sm resize-none",
+						cardShape,
+						!props.asParent && props.item.children.length > 0 ? "border-b-3 border-r-3" : "",
+						props.asParent ? "bg-transparent shadow-none border-none" : "",
+					)}
+					defaultValue={item.description}
+					onBlur={(e) => {
+						if (e.target.value.trim() !== "") {
+							submitJson({ ...item, description: e.target.value }, "PUT");
+						} else {
+							submitJson(item, "DELETE");
+						}
+						setEditing(false);
+					}}
+				/>
+			) : (
+				<button
+					type="button"
+					className={cn(
+						styles.content,
+						focusVisibleStyle,
+						"z-20 bg-card border shadow-sm p-2 text-sm",
+						cardShape,
+						!props.asParent && props.item.children.length > 0 ? "border-b-3 border-r-3" : "",
+						"grid place-content-start text-start",
+						props.asParent ? "bg-transparent shadow-none border-none" : "",
+					)}
+					onClick={() => setEditing(true)}
+					draggable={!props.asParent}
+					onDragStart={onDragStart}
+				>
+					{item.description.split("\n").map((line, i) => (
+						<p key={String(i) + line}>{line}</p>
+					))}
+				</button>
+			)}
 		</div>
 	);
 }
