@@ -1,20 +1,15 @@
 import React from "react";
-import { useFetcher } from "react-router";
-import type { Item } from "../models";
-import { isItem } from "../services";
+import { type Item, itemSchema } from "../models";
 
 const cardType = "application/item-card";
 type InsertAt = "none" | "before" | "after";
 
-export function useStartCardInsert(parent: Item, siblingIndex: number) {
-	const item = parent.children[siblingIndex];
-
+export function useStartCardInsert(item: Item) {
 	function onDragStart(e: React.DragEvent) {
 		e.stopPropagation();
 		e.dataTransfer.effectAllowed = "move";
 		e.dataTransfer.setData(cardType, JSON.stringify(item));
 	}
-
 	return onDragStart;
 }
 
@@ -27,13 +22,8 @@ export function useAcceptCardInsert(
 		clientY: number;
 		insertAt: InsertAt;
 	}) => InsertAt,
-	onMoveItem: (
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) => void,
+	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void,
 ) {
-	const item = parent.children[siblingIndex];
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
 
 	function onDragOver(e: React.DragEvent) {
@@ -58,14 +48,16 @@ export function useAcceptCardInsert(
 		e.preventDefault();
 		e.stopPropagation();
 		const data = e.dataTransfer.getData("application/item-card");
-		const item = JSON.parse(data);
-		if (!isItem(item)) {
-			throw new Error("Invalid item");
-		}
-		onMoveItem(
+		const item = itemSchema.parse(JSON.parse(data));
+		const siblingIndexAfterItemLeft =
+			parent.children.some((c) => c.id === item.id) &&
+			parent.children.findIndex((child) => child.id === item.id) < siblingIndex
+				? siblingIndex - 1
+				: siblingIndex;
+		moveItem(
 			item.id,
 			parent.id,
-			insertAt === "before" ? siblingIndex : siblingIndex + 1,
+			insertAt === "before" ? siblingIndexAfterItemLeft : siblingIndexAfterItemLeft + 1,
 		);
 		setInsertAt("none");
 	}

@@ -1,315 +1,78 @@
 import { describe, expect, it } from "vitest";
 import type { Item } from "~/map/models";
-import {
-	addNewItem,
-	deleteItem,
-	findParentByChildId,
-	moveItem,
-	parseMarkdownToItem,
-	serializeItemToMarkdown,
-	updateItem,
-} from "./index";
-
-function getSampleMap(): Item {
-	return {
-		id: "__root",
-		description: "",
-		isExpanded: true,
-		children: [
-			{
-				id: "1",
-				description: "Item 1",
-				isExpanded: false,
-				children: [
-					{
-						id: "2",
-						description: "Item 2",
-						isExpanded: false,
-						children: [
-							{
-								id: "5",
-								description: "Item 5",
-								isExpanded: false,
-								children: [],
-							},
-							{
-								id: "6",
-								description: "Item 6",
-								isExpanded: false,
-								children: [],
-							},
-						],
-					},
-					{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-					{
-						id: "4",
-						description: "Item 4",
-						isExpanded: false,
-						children: [
-							{
-								id: "7",
-								description: "Item 7",
-								isExpanded: false,
-								children: [],
-							},
-						],
-					},
-				],
-			},
-			{
-				id: "8",
-				description: "Item 8",
-				isExpanded: false,
-				children: [],
-			},
-		],
-	};
-}
-
-describe("parseMarkdownToMap", () => {
-	it("should parse a simple markdown list into items", () => {
-		const markdown = `
-      - Item 1
-        - Item 2
-          - Item 5
-          - Item 6
-        - Item 3
-        - Item 4
-          - Item 7
-      - Item 8
-    `;
-		const expected: Item = {
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
-					id: expect.any(String),
-					description: "Item 1",
-					isExpanded: false,
-					children: [
-						{
-							id: expect.any(String),
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: expect.any(String),
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: expect.any(String),
-									description: "Item 6",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{
-							id: expect.any(String),
-							description: "Item 3",
-							isExpanded: false,
-							children: [],
-						},
-						{
-							id: expect.any(String),
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: expect.any(String),
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-					],
-				},
-				{
-					id: expect.any(String),
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		};
-		const result = parseMarkdownToItem(markdown);
-		expect(result).toEqual(expected);
-	});
-
-	it("should handle an empty markdown string", () => {
-		const markdown = "";
-		const result = parseMarkdownToItem(markdown);
-		expect(result).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [],
-		});
-	});
-});
-
-describe("serializeMapToMarkdown", () => {
-	it("should serialize items into a markdown string", () => {
-		const map = getSampleMap();
-
-		const expected = `- Item 1
-    - Item 2
-        - Item 5
-        - Item 6
-    - Item 3
-    - Item 4
-        - Item 7
-- Item 8`;
-
-		const result = serializeItemToMarkdown(map);
-		expect(result).toEqual(expected);
-	});
-
-	it("should handle an empty list of items", () => {
-		const map: Item = {
-			id: "__root",
-			description: "",
-			isExpanded: false,
-			children: [],
-		};
-		const result = serializeItemToMarkdown(map);
-		expect(result).toEqual("");
-	});
-});
+import { addNewItem, deleteItem, findParentByChildId, moveItem, updateItem } from "./index";
+import { _expectedItem, _item, _rootItem } from "./test-utils";
 
 describe("updateItemDescription", () => {
 	it("should update the description of a root item", () => {
-		const items = getSampleMap();
+		const map = _rootItem([
+			_item({
+				id: "1",
+				description: "Item 1",
+				children: [_item({ description: "Item 3" })],
+			}),
+			_item({ description: "Item 2" }),
+		]);
 
-		const updatedItems = updateItem(items, {
+		const updatedItems = updateItem(map, {
 			id: "1",
 			description: "Updated Item 1",
 		});
-		expect(updatedItems).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
-					id: "1",
+		expect(updatedItems).toEqual(
+			_rootItem([
+				_expectedItem({
 					description: "Updated Item 1",
-					isExpanded: false,
-					children: [
-						{
-							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "6",
-									description: "Item 6",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+					children: [_expectedItem({ description: "Item 3" })],
+				}),
+				_expectedItem({ description: "Item 2" }),
+			]),
+		);
 	});
 
-	it("should update the description of an item that is a child of a child", () => {
-		const map: Item = getSampleMap();
+	it("should update the description of a child", () => {
+		const map = _rootItem([
+			_item({
+				description: "Item 1",
+				children: [
+					_item({
+						description: "Item 2",
+						children: [_item({ description: "Item 5" }), _item({ id: "6", description: "Item 6" })],
+					}),
+				],
+			}),
+		]);
 
 		const updatedItems = updateItem(map, {
 			id: "6",
 			description: "Updated Item 6",
 		});
-		expect(updatedItems).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
-					id: "1",
+		expect(updatedItems).toEqual(
+			_rootItem([
+				_expectedItem({
 					description: "Item 1",
-					isExpanded: false,
 					children: [
-						{
-							id: "2",
+						_expectedItem({
 							description: "Item 2",
-							isExpanded: false,
 							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "6",
-									description: "Updated Item 6",
-									isExpanded: false,
-									children: [],
-								},
+								_expectedItem({ description: "Item 5" }),
+								_expectedItem({ description: "Updated Item 6" }),
 							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
+						}),
 					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+				}),
+			]),
+		);
 	});
 });
 
 describe("addNewItem", () => {
 	it("should add a new item to the root", () => {
-		const map = getSampleMap();
+		const map = _rootItem([
+			_item({
+				description: "Item 1",
+				children: [_item({ description: "Item 2" })],
+			}),
+		]);
 
 		const newMap = addNewItem("__root", map, {
 			id: "some",
@@ -317,142 +80,45 @@ describe("addNewItem", () => {
 			isExpanded: false,
 			children: [],
 		});
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
-					id: "1",
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
 					description: "Item 1",
-					isExpanded: false,
-					children: [
-						{
-							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "6",
-									description: "Item 6",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-				{
-					id: expect.any(String),
-					description: "Some",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+					children: [_expectedItem({ description: "Item 2" })],
+				}),
+				_expectedItem({ description: "Some" }),
+			]),
+		);
 	});
 
 	it("should add a new item to a child", () => {
-		const map = getSampleMap();
+		const map = _rootItem([_item({ id: "1", children: [_item({ id: "2" })] })]);
 
-		const newMap = addNewItem("6", map, {
+		const newMap = addNewItem("1", map, {
 			id: "some",
 			description: "Some",
 			isExpanded: false,
 			children: [],
 		});
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
 					id: "1",
-					description: "Item 1",
-					isExpanded: false,
-					children: [
-						{
-							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "6",
-									description: "Item 6",
-									isExpanded: false,
-									children: [
-										{
-											id: "some",
-											description: "Some",
-											isExpanded: false,
-											children: [],
-										},
-									],
-								},
-							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+					children: [_expectedItem({ id: "2" }), _expectedItem({ id: "some" })],
+				}),
+			]),
+		);
 	});
 
 	it("should add a new item to a child at a specific index", () => {
-		const map = getSampleMap();
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [_item({ id: "2" }), _item({ id: "3" }), _item({ id: "4" })],
+			}),
+		]);
 		const newMap = addNewItem(
-			"2",
+			"1",
 			map,
 			{
 				id: "some",
@@ -460,340 +126,207 @@ describe("addNewItem", () => {
 				isExpanded: false,
 				children: [],
 			},
-			0,
+			2,
 		);
 
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
 					id: "1",
-					description: "Item 1",
-					isExpanded: false,
 					children: [
-						{
-							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "some",
-									description: "Some",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "6",
-									description: "Item 6",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
+						_expectedItem({ id: "2" }),
+						_expectedItem({ id: "3" }),
+						_expectedItem({ id: "some", description: "Some" }),
+						_expectedItem({ id: "4" }),
 					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+				}),
+			]),
+		);
 	});
 });
 
 describe("moveItem", () => {
 	it("should move a root item before another item", () => {
-		const map = getSampleMap();
+		const map = _rootItem([_item({ id: "1" }), _item({ id: "2" }), _item({ id: "3" })]);
 
-		const newMap = moveItem("8", "__root", 0, map);
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-				{
-					id: "1",
-					description: "Item 1",
-					isExpanded: false,
-					children: [
-						{
-							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "6",
-									description: "Item 6",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-					],
-				},
-			],
-		});
+		const newMap = moveItem("2", "__root", 0, map);
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({ id: "2" }),
+				_expectedItem({ id: "1" }),
+				_expectedItem({ id: "3" }),
+			]),
+		);
 	});
 
 	it("should move a child to upper-level place", () => {
-		const map = getSampleMap();
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [
+					_item({
+						id: "2",
+						children: [_item({ id: "5" })],
+					}),
+					_item({ id: "6" }),
+					_item({ id: "3" }),
+				],
+			}),
+		]);
 
-		const newMap = moveItem("6", "1", 1, map);
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
+		const newMap = moveItem("3", "1", 1, map);
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
 					id: "1",
-					description: "Item 1",
-					isExpanded: false,
 					children: [
-						{
+						_expectedItem({
 							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{
-							id: "6",
-							description: "Item 6",
-							isExpanded: false,
-							children: [],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
+							children: [_expectedItem({ id: "5" })],
+						}),
+						_expectedItem({ id: "3" }),
+						_expectedItem({ id: "6" }),
 					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+				}),
+			]),
+		);
 	});
 
 	it("should move a child to lower-level place", () => {
-		const map = getSampleMap();
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [
+					_item({
+						id: "2",
+						children: [_item({ id: "5" })],
+					}),
+					_item({ id: "6" }),
+					_item({ id: "3" }),
+				],
+			}),
+		]);
 
-		const newMap = moveItem("2", "4", 1, map);
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
+		const newMap = moveItem("6", "2", 1, map);
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
 					id: "1",
-					description: "Item 1",
-					isExpanded: false,
 					children: [
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-								{
-									id: "2",
-									description: "Item 2",
-									isExpanded: false,
-									children: [
-										{
-											id: "5",
-											description: "Item 5",
-											isExpanded: false,
-											children: [],
-										},
-										{
-											id: "6",
-											description: "Item 6",
-											isExpanded: false,
-											children: [],
-										},
-									],
-								},
-							],
-						},
+						_expectedItem({
+							id: "2",
+							children: [_expectedItem({ id: "5" }), _expectedItem({ id: "6" })],
+						}),
+						_expectedItem({ id: "3" }),
 					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+				}),
+			]),
+		);
+	});
+
+	it("should move a child to the same-level place", () => {
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [
+					_item({
+						id: "2",
+						children: [_item({ id: "5" })],
+					}),
+					_item({ id: "6" }),
+					_item({ id: "3" }),
+				],
+			}),
+		]);
+
+		const newMap = moveItem("2", "1", 1, map);
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
+					id: "1",
+					children: [
+						_expectedItem({ id: "6" }),
+						_expectedItem({
+							id: "2",
+							children: [_expectedItem({ id: "5" })],
+						}),
+						_expectedItem({ id: "3" }),
+					],
+				}),
+			]),
+		);
 	});
 
 	it("should do nothing when move a child to the same place", () => {
-		const map = getSampleMap();
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [
+					_item({
+						id: "2",
+						children: [_item({ id: "5" })],
+					}),
+					_item({ id: "6" }),
+					_item({ id: "3" }),
+				],
+			}),
+		]);
 
-		const newMap = moveItem("3", "1", 1, map);
+		const newMap = moveItem("2", "1", 0, map);
 		expect(newMap).toEqual(map);
 	});
 });
 
 describe("deleteItem", () => {
 	it("should delete a root item", () => {
-		const map = getSampleMap();
-		const newMap = deleteItem("1", map);
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+		const map = _rootItem([_item({ id: "1" }), _item({ id: "2" }), _item({ id: "3" })]);
+		const newMap = deleteItem("2", map);
+
+		expect(newMap).toEqual(_rootItem([_expectedItem({ id: "1" }), _expectedItem({ id: "3" })]));
 	});
 
 	it("should delete a child", () => {
-		const map: Item = getSampleMap();
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [_item({ id: "2" }), _item({ id: "3" }), _item({ id: "4" })],
+			}),
+		]);
+		const newMap = deleteItem("3", map);
 
-		const newMap = deleteItem("6", map);
-		expect(newMap).toEqual({
-			id: "__root",
-			description: "",
-			isExpanded: true,
-			children: [
-				{
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
 					id: "1",
-					description: "Item 1",
-					isExpanded: false,
-					children: [
-						{
-							id: "2",
-							description: "Item 2",
-							isExpanded: false,
-							children: [
-								{
-									id: "5",
-									description: "Item 5",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-						{ id: "3", description: "Item 3", isExpanded: false, children: [] },
-						{
-							id: "4",
-							description: "Item 4",
-							isExpanded: false,
-							children: [
-								{
-									id: "7",
-									description: "Item 7",
-									isExpanded: false,
-									children: [],
-								},
-							],
-						},
-					],
-				},
-				{
-					id: "8",
-					description: "Item 8",
-					isExpanded: false,
-					children: [],
-				},
-			],
-		});
+					children: [_expectedItem({ id: "2" }), _expectedItem({ id: "4" })],
+				}),
+			]),
+		);
 	});
 });
 
 describe("findParentByChildId", () => {
 	it("should find the parent of a child item", () => {
-		const map = getSampleMap();
-		const parent = findParentByChildId(map, "6");
-		expect(parent?.id).toBe("2");
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [_item({ id: "2" }), _item({ id: "3" }), _item({ id: "4" })],
+			}),
+		]);
+
+		const parent = findParentByChildId(map, "3");
+		expect(parent).toEqual(map.children[0]);
 	});
 
 	it("should return null if the child is not found", () => {
-		const map = getSampleMap();
-		const parent = findParentByChildId(map, "non-existing");
-		expect(parent).toBe(null);
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [_item({ id: "2" }), _item({ id: "3" }), _item({ id: "4" })],
+			}),
+		]);
+
+		const parent = findParentByChildId(map, "5");
+		expect(parent).toBeNull();
 	});
 });

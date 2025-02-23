@@ -33,8 +33,9 @@
 
 .mainLayout {
 	display: grid;
-	gap: 0px;
+	gap: 8px 16px;
 	justify-items: start;
 	justify-content: start;
+	align-content: start;
 	grid-auto-flow: column;
 }

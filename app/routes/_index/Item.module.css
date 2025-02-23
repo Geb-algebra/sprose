@@ -1,3 +1,15 @@
+.insertTop {
+	grid-area: insert-top;
+}
+
+.insertBottom {
+	grid-area: insert-bottom;
+}
+
+.content {
+	grid-area: content;
+}
+
 .layout {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -7,16 +19,4 @@
 		"insert-top"
 		"content"
 		"insert-bottom";
-}
-
-.content {
-	grid-area: content;
-}
-
-.insertTop {
-	grid-area: insert-top;
-}
-
-.insertBottom {
-	grid-area: insert-bottom;
 }

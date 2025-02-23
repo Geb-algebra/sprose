@@ -1,10 +1,5 @@
 import { Button } from "./Button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "./Tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./Tooltip";
 
 export function TooltipButton(
 	props: React.ComponentProps<typeof Button> & {
@@ -14,7 +9,7 @@ export function TooltipButton(
 	return (
 		<TooltipProvider delayDuration={300}>
 			<Tooltip>
-				<TooltipTrigger>
+				<TooltipTrigger asChild>
 					<Button {...props} />
 				</TooltipTrigger>
 				<TooltipContent>{props.tooltip}</TooltipContent>

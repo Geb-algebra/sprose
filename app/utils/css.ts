@@ -7,6 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 
 export const focusVisibleStyle =
 	"focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring outline-none";
-export const cardShape = "w-56  min-h-20 h-auto rounded-lg";
+export const cardShape = "w-56 min-h-20 h-auto rounded-lg";
 export const inserterShape = (isExpanded: boolean) =>
-	cn(isExpanded ? "w-10 h-full" : "w-full h-10");
+	cn(cardShape, isExpanded ? "w-8 h-full" : "h-8 min-h-none");

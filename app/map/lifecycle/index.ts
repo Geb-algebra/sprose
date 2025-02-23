@@ -31,10 +31,7 @@ export class MapRepository {
 		// history is ordered from newest to oldest
 		mapData.mapHistory = [
 			map,
-			...mapData.mapHistory.slice(
-				mapData.currentMapIndex,
-				mapData.mapHistory.length,
-			),
+			...mapData.mapHistory.slice(mapData.currentMapIndex, mapData.mapHistory.length),
 		];
 		if (mapData.mapHistory.length > 100) {
 			mapData.mapHistory.pop();
