@@ -1,6 +1,7 @@
 import { RedoIcon, UndoIcon } from "lucide-react";
 import { useFetcher } from "react-router";
 import { TooltipButton } from "~/components/TooltipButton";
+import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { cn } from "~/utils/css";
@@ -21,6 +22,15 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
 export function Control(props: { map: Item; className?: string }) {
 	const fetcher = useFetcher();
+
+	useKeyboardShortcut(["ctrl+z", "meta+z"], () => {
+		fetcher.submit({ action: "undo" }, { method: "post", action: "/control" });
+	});
+
+	useKeyboardShortcut(["ctrl+shift+z", "meta+shift+z"], () => {
+		fetcher.submit({ action: "redo" }, { method: "post", action: "/control" });
+	});
+
 	return (
 		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>
 			<fetcher.Form action="/control" method="post" className="flex w-fit">
