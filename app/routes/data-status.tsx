@@ -1,13 +1,11 @@
-import { ArrowRightIcon, ArrowUpDownIcon, CheckIcon, DatabaseIcon, RefreshCw } from "lucide-react";
+import { ArrowUpDownIcon, CheckIcon, DatabaseIcon, RefreshCw } from "lucide-react";
 import React from "react";
 import { useFetcher } from "react-router";
-import { ExportMarkdownButton } from "~/components/ExportMarkdownButton";
 import { MapRepository } from "~/map/lifecycle";
 import { type Item, itemSchema } from "~/map/models";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/data-status";
 import styles from "./data-status.module.css";
-import { ImportMarkdownButton } from "./import-markdown";
 
 export async function clientLoader() {
 	return await MapRepository.get();
@@ -39,11 +37,7 @@ export function DataStatus(props: { currentItem: Item }) {
 	}, [isInSync, props.currentItem, fetcher]);
 	return (
 		<div className={cn(styles.layout, "-mb-5 z-1")}>
-			<ImportMarkdownButton className={styles.import} />
-			<ArrowRightIcon size={18} className={cn(styles.inarrow, "text-secondary")} />
 			<DatabaseIcon size={24} className={styles.database} />
-			<ArrowRightIcon size={18} className={cn(styles.exarrow, "text-secondary")} />
-			<ExportMarkdownButton className={styles.export} />
 			<div className={cn("flex items-center ml-2", styles.sync)}>
 				<ArrowUpDownIcon size={18} />
 				{isInSync ? (

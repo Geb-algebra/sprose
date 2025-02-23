@@ -224,6 +224,39 @@ describe("moveItem", () => {
 		);
 	});
 
+	it("should move a child to the same-level place", () => {
+		const map = _rootItem([
+			_item({
+				id: "1",
+				children: [
+					_item({
+						id: "2",
+						children: [_item({ id: "5" })],
+					}),
+					_item({ id: "6" }),
+					_item({ id: "3" }),
+				],
+			}),
+		]);
+
+		const newMap = moveItem("2", "1", 1, map);
+		expect(newMap).toEqual(
+			_rootItem([
+				_expectedItem({
+					id: "1",
+					children: [
+						_expectedItem({ id: "6" }),
+						_expectedItem({
+							id: "2",
+							children: [_expectedItem({ id: "5" })],
+						}),
+						_expectedItem({ id: "3" }),
+					],
+				}),
+			]),
+		);
+	});
+
 	it("should do nothing when move a child to the same place", () => {
 		const map = _rootItem([
 			_item({

@@ -32,17 +32,15 @@ export function AddItemButton(props: {
 		>
 			<div
 				className={cn(
-					"pb-2 pr-2",
 					inserterShape(props.parent.isExpanded),
-					insertAt === "before" ? styles.insert : "hidden",
+					insertAt !== "before" && "hidden",
+					"bg-secondary rounded-lg",
 				)}
-			>
-				<div className={cn("bg-secondary w-full h-full rounded-lg")} />
-			</div>
+			/>
 			{writing ? (
 				<BlurOnEnterTextArea
 					className={cn(
-						"mr-2 mb-2 grid place-content-center bg-card p-2 text-sm resize-none",
+						"grid place-content-center bg-card p-2 text-sm resize-none",
 						cardShape,
 						"h-20",
 						focusVisibleStyle,
@@ -65,14 +63,14 @@ export function AddItemButton(props: {
 						"rounded-lg grid place-content-center bg-transparent transition-colors outline-none",
 						cardShape,
 						"h-20",
-						"border-2 border-dashed hover:border-ring focus-visible:border-ring",
-						"text-2xl text-border hover:text-ring focus-visible:text-ring",
+						"border-2 border-border/50 border-dashed hover:border-ring focus-visible:border-ring",
+						"text-2xl text-border/50 hover:text-ring focus-visible:text-ring",
 					)}
 				>
 					+
 				</button>
 			) : (
-				<div className={cn(inserterShape(props.parent.isExpanded), "pr-2 pb-2")}>
+				<div className={cn(inserterShape(props.parent.isExpanded))}>
 					<button
 						type="button"
 						onClick={() => {
@@ -80,8 +78,8 @@ export function AddItemButton(props: {
 						}}
 						className={cn(
 							"w-full h-full rounded-lg grid place-content-center bg-transparent transition-colors outline-none",
-							"border-2 border-dashed hover:border-ring focus-visible:border-ring",
-							"text-2xl text-border hover:text-ring focus-visible:text-ring",
+							"border-2 border-border/50 border-dashed hover:border-ring focus-visible:border-ring",
+							"text-2xl text-border/50 hover:text-ring focus-visible:text-ring",
 						)}
 					>
 						+

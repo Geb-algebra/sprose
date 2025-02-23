@@ -13,7 +13,7 @@ import { MapRepository } from "~/map/lifecycle";
 import { type Item, itemSchema } from "~/map/models";
 import { deleteItem, moveItem, updateItem } from "~/map/services";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
-import { Control } from "~/routes/control";
+import { Control } from "~/routes/control/route";
 import type { Route } from "./+types/route";
 import { AddItemButton } from "./AddItemButton";
 import { ItemFamily } from "./ItemFamily";
@@ -63,7 +63,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 					<Logo fill="var(--primary)" size={42} />
 					Sprose
 				</h1>
-				<Control className={styles.control} />
+				<Control map={map} className={styles.control} />
 				<ContextMenuTrigger asChild>
 					<main
 						className={cn(

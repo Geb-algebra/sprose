@@ -6,10 +6,6 @@ import { type Item, itemSchema } from "~/map/models";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 import styles from "./item.module.css";
 
-function PseudoCard(props: { className?: string }) {
-	return <div className={cn(props.className, "shadow-sm bg-card p-2", cardShape)} />;
-}
-
 export function ItemCard(props: {
 	item: Item;
 	asParent: boolean;
@@ -29,52 +25,47 @@ export function ItemCard(props: {
 
 	return (
 		<div className={cn(styles.layout, props.className)}>
-			<div className={cn("w-[232px] min-h-[88px] relative", styles.content)}>
-				{editing ? (
-					<BlurOnEnterTextArea
-						className={cn(
-							focusVisibleStyle,
-							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2 resize-none",
-							cardShape,
-							props.asParent ? "bg-transparent shadow-none border-none" : "",
-						)}
-						defaultValue={item.description}
-						onBlur={(e) => {
-							if (e.target.value.trim() !== "") {
-								submitJson({ ...item, description: e.target.value }, "PUT");
-							} else {
-								submitJson(item, "DELETE");
-							}
-							setEditing(false);
-						}}
-					/>
-				) : (
-					<button
-						type="button"
-						className={cn(
-							styles.content,
-							focusVisibleStyle,
-							"z-20 bg-card border shadow-sm p-2 text-sm mb-2 mr-2",
-							cardShape,
-							"grid place-content-start text-start",
-							props.asParent ? "bg-transparent shadow-none border-none" : "",
-						)}
-						onClick={() => setEditing(true)}
-						draggable={!props.asParent}
-						onDragStart={onDragStart}
-					>
-						{item.description.split("\n").map((line, i) => (
-							<p key={String(i) + line}>{line}</p>
-						))}
-					</button>
-				)}
-				{/* {!props.asParent && item.children.length > 0 ? (
-					<>
-						<PseudoCard className="absolute top-[2px] left-[2px] z-10" />
-						<PseudoCard className="absolute top-[4px] left-[4px] z-5" />
-					</>
-				) : null} */}
-			</div>
+			{editing ? (
+				<BlurOnEnterTextArea
+					className={cn(
+						styles.content,
+						focusVisibleStyle,
+						"bg-card p-2 shadow-sm border text-sm resize-none",
+						cardShape,
+						!props.asParent && props.item.children.length > 0 ? "border-b-3 border-r-3" : "",
+						props.asParent ? "bg-transparent shadow-none border-none" : "",
+					)}
+					defaultValue={item.description}
+					onBlur={(e) => {
+						if (e.target.value.trim() !== "") {
+							submitJson({ ...item, description: e.target.value }, "PUT");
+						} else {
+							submitJson(item, "DELETE");
+						}
+						setEditing(false);
+					}}
+				/>
+			) : (
+				<button
+					type="button"
+					className={cn(
+						styles.content,
+						focusVisibleStyle,
+						"z-20 bg-card border shadow-sm p-2 text-sm",
+						cardShape,
+						!props.asParent && props.item.children.length > 0 ? "border-b-3 border-r-3" : "",
+						"grid place-content-start text-start",
+						props.asParent ? "bg-transparent shadow-none border-none" : "",
+					)}
+					onClick={() => setEditing(true)}
+					draggable={!props.asParent}
+					onDragStart={onDragStart}
+				>
+					{item.description.split("\n").map((line, i) => (
+						<p key={String(i) + line}>{line}</p>
+					))}
+				</button>
+			)}
 		</div>
 	);
 }
