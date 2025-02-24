@@ -20,6 +20,8 @@ export function AddItemButton(props: {
 		() => "before",
 		props.moveItem,
 	);
+
+	const addButton = React.useRef<HTMLButtonElement | null>(null);
 	return (
 		<div
 			className={cn(
@@ -51,10 +53,12 @@ export function AddItemButton(props: {
 						}
 						setWriting(false);
 					}}
+					nextElement={addButton.current}
 				/>
 			) : null}
 			{props.parent.id === "__root" ? (
 				<button
+					ref={addButton}
 					type="button"
 					onClick={() => {
 						setWriting(true);
@@ -72,6 +76,7 @@ export function AddItemButton(props: {
 			) : (
 				<div className={cn(inserterShape(props.parent.isExpanded))}>
 					<button
+						ref={addButton}
 						type="button"
 						onClick={() => {
 							setWriting(true);

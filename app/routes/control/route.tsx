@@ -1,6 +1,7 @@
 import { RedoIcon, UndoIcon } from "lucide-react";
 import { useFetcher } from "react-router";
 import { TooltipButton } from "~/components/TooltipButton";
+import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
 import { cn } from "~/utils/css";
@@ -21,6 +22,23 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
 export function Control(props: { map: Item; className?: string }) {
 	const fetcher = useFetcher();
+
+	useKeyboardShortcut(
+		["ctrl+z", "meta+z"],
+		() => {
+			fetcher.submit({ action: "undo" }, { method: "post", action: "/control" });
+		},
+		(e) => e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement,
+	);
+
+	useKeyboardShortcut(
+		["ctrl+shift+z", "meta+shift+z"],
+		() => {
+			fetcher.submit({ action: "redo" }, { method: "post", action: "/control" });
+		},
+		(e) => e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement,
+	);
+
 	return (
 		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>
 			<fetcher.Form action="/control" method="post" className="flex w-fit">
@@ -30,7 +48,7 @@ export function Control(props: { map: Item; className?: string }) {
 					variant="ghost"
 					size="icon"
 					value="undo"
-					tooltip="Undo"
+					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘Z" : "Ctrl+Z"})`}
 				>
 					<UndoIcon />
 				</TooltipButton>
@@ -40,7 +58,7 @@ export function Control(props: { map: Item; className?: string }) {
 					variant="ghost"
 					size="icon"
 					value="redo"
-					tooltip="Redo"
+					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘⇧Z" : "Ctrl+Shift+Z"})`}
 				>
 					<RedoIcon />
 				</TooltipButton>
