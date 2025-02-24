@@ -23,13 +23,21 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 export function Control(props: { map: Item; className?: string }) {
 	const fetcher = useFetcher();
 
-	useKeyboardShortcut(["ctrl+z", "meta+z"], () => {
-		fetcher.submit({ action: "undo" }, { method: "post", action: "/control" });
-	});
+	useKeyboardShortcut(
+		["ctrl+z", "meta+z"],
+		() => {
+			fetcher.submit({ action: "undo" }, { method: "post", action: "/control" });
+		},
+		(e) => e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement,
+	);
 
-	useKeyboardShortcut(["ctrl+shift+z", "meta+shift+z"], () => {
-		fetcher.submit({ action: "redo" }, { method: "post", action: "/control" });
-	});
+	useKeyboardShortcut(
+		["ctrl+shift+z", "meta+shift+z"],
+		() => {
+			fetcher.submit({ action: "redo" }, { method: "post", action: "/control" });
+		},
+		(e) => e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement,
+	);
 
 	return (
 		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>

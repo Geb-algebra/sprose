@@ -12,7 +12,11 @@ type KeyBinding = {
 	};
 };
 
-export function useKeyboardShortcut(keyCombos: string[], callback: (e: KeyboardEvent) => void) {
+export function useKeyboardShortcut(
+	keyCombos: string[],
+	callback: (e: KeyboardEvent) => void,
+	disabled?: (e: KeyboardEvent) => boolean,
+) {
 	useEffect(() => {
 		const modifierKeys: ModifierKey[] = ["ctrl", "shift", "alt", "meta"];
 		const keyBindings: KeyBinding[] = keyCombos
@@ -42,15 +46,16 @@ export function useKeyboardShortcut(keyCombos: string[], callback: (e: KeyboardE
 		}
 
 		const keyHandler = (e: KeyboardEvent) => {
-			e.preventDefault();
 			for (const binding of keyBindings) {
 				if (
 					e.key.toLowerCase() === binding.mainKey &&
 					e.ctrlKey === binding.requiredModifiers.ctrl &&
 					e.shiftKey === binding.requiredModifiers.shift &&
 					e.altKey === binding.requiredModifiers.alt &&
-					e.metaKey === binding.requiredModifiers.meta
+					e.metaKey === binding.requiredModifiers.meta &&
+					(disabled === undefined || !disabled(e))
 				) {
+					e.preventDefault();
 					callback(e);
 					break;
 				}
@@ -61,5 +66,5 @@ export function useKeyboardShortcut(keyCombos: string[], callback: (e: KeyboardE
 		return () => {
 			window.removeEventListener("keydown", keyHandler);
 		};
-	}, [keyCombos, callback]);
+	}, [keyCombos, callback, disabled]);
 }
