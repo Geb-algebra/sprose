@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export function BlurOnEnterTextArea(props: {
 	onBlur: React.FocusEventHandler<HTMLTextAreaElement>;
+	nextElement?: HTMLButtonElement | null;
 	defaultValue?: string;
 	className?: string;
 }) {
@@ -18,6 +19,7 @@ export function BlurOnEnterTextArea(props: {
 				if (e.key === "Enter" && !e.shiftKey && !isComposing) {
 					e.preventDefault();
 					e.currentTarget.blur();
+					props.nextElement?.focus();
 				}
 			}}
 			onFocus={(e) => {
