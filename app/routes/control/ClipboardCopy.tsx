@@ -2,9 +2,7 @@ import { ClipboardCopyIcon } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import { TooltipButton } from "~/components/TooltipButton";
-import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import type { Item } from "~/map/models";
-import { serializeItemToMarkdown } from "~/map/services";
 import { copyItemToClipboard } from "~/map/services/clipboard.client";
 
 export default function ClipboardCopy(props: { map: Item }) {

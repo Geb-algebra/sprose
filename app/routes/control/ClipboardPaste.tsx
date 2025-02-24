@@ -1,6 +1,5 @@
 import { ClipboardPasteIcon } from "lucide-react";
-import React from "react";
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import {
@@ -13,7 +12,6 @@ import {
 	DialogTrigger,
 } from "~/components/Dialog";
 import { TooltipButton } from "~/components/TooltipButton";
-import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import type { Item } from "~/map/models";
 import { getChildFromClipboard } from "~/map/services/clipboard.client";
 
