@@ -1,15 +1,24 @@
 import { ClipboardCopyIcon } from "lucide-react";
+import React from "react";
 import { toast } from "sonner";
 import { TooltipButton } from "~/components/TooltipButton";
-import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import type { Item } from "~/map/models";
 import { copyItemToClipboard } from "~/map/services/clipboard.client";
 
 export default function ClipboardCopy(props: { map: Item }) {
-	useKeyboardShortcut(["ctrl+c", "meta+c"], () => {
-		copyItemToClipboard(props.map);
-		toast("Copied to clipboard!");
-	});
+	React.useEffect(() => {
+		const handler = (e: ClipboardEvent) => {
+			const activeEl = document.activeElement;
+			if (activeEl && activeEl !== document.body && activeEl.tagName !== "HTML") {
+				return;
+			}
+			copyItemToClipboard(props.map);
+			toast("Copied to clipboard!");
+		};
+		document.addEventListener("copy", handler);
+		return () => document.removeEventListener("copy", handler);
+	}, [props.map]);
+
 	return (
 		<TooltipButton
 			type="button"
