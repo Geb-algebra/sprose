@@ -14,7 +14,7 @@ export default function ClipboardCopy(props: { map: Item }) {
 			variant="ghost"
 			size="icon"
 			onClick={() => copyItemToClipboard(props.map)}
-			tooltip="Copy to clipboard"
+			tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘C" : "Ctrl+C"})`}
 		>
 			<ClipboardCopyIcon />
 		</TooltipButton>

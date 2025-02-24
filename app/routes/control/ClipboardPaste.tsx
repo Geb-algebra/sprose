@@ -37,7 +37,7 @@ export default function ClipboardPaste(props: { map: Item }) {
 					type="button"
 					variant="ghost"
 					size="icon"
-					tooltip="Paste from clipboard"
+					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘V" : "Ctrl+V"})`}
 				>
 					<ClipboardPasteIcon />
 				</TooltipButton>

@@ -1,12 +1,12 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useFetcher } from "react-router";
-import { Button } from "~/components/Button";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
+import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { useAcceptCardInsert, useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { type Item, itemSchema } from "~/map/models";
@@ -85,20 +85,21 @@ export function ItemFamily(props: {
 								)}
 							>
 								<ItemCard asParent item={item} className={cn(styles.self, "relative z-10")} />
-								<Button
+								<TooltipButton
 									type="button"
 									variant="ghost"
 									size="icon"
 									className={cn(styles.expand, "w-4 h-20 ml-auto")}
 									disabled={item.children.length === 0}
 									onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
+									tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
 								>
 									{item.children.length === 0 ? null : item.isExpanded ? (
 										<ChevronLeftIcon />
 									) : (
 										<ChevronRightIcon />
 									)}
-								</Button>
+								</TooltipButton>
 							</div>
 							<div
 								className={cn(

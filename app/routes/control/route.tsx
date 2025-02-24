@@ -4,7 +4,6 @@ import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { copyItemToClipboard } from "~/map/services/clipboard.client";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/route";
 import ClipboardCopy from "./ClipboardCopy";
@@ -49,7 +48,7 @@ export function Control(props: { map: Item; className?: string }) {
 					variant="ghost"
 					size="icon"
 					value="undo"
-					tooltip="Undo"
+					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘Z" : "Ctrl+Z"})`}
 				>
 					<UndoIcon />
 				</TooltipButton>
@@ -59,7 +58,7 @@ export function Control(props: { map: Item; className?: string }) {
 					variant="ghost"
 					size="icon"
 					value="redo"
-					tooltip="Redo"
+					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘⇧Z" : "Ctrl+Shift+Z"})`}
 				>
 					<RedoIcon />
 				</TooltipButton>
