@@ -1,4 +1,5 @@
 import { ClipboardPasteIcon } from "lucide-react";
+import { useRef } from "react";
 import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import {
@@ -11,15 +12,33 @@ import {
 	DialogTrigger,
 } from "~/components/Dialog";
 import { TooltipButton } from "~/components/TooltipButton";
+import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import type { Item } from "~/map/models";
 import { getChildFromClipboard } from "~/map/services/clipboard.client";
 
 export default function ClipboardPaste(props: { map: Item }) {
 	const fetcher = useFetcher();
+
+	const dialogTriggerRef = useRef<HTMLButtonElement>(null);
+
+	useKeyboardShortcut(
+		["ctrl+v", "meta+v"],
+		() => {
+			dialogTriggerRef.current?.click();
+		},
+		(e) => e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement,
+	);
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<TooltipButton type="button" variant="ghost" size="icon" tooltip="Paste from clipboard">
+				<TooltipButton
+					ref={dialogTriggerRef}
+					type="button"
+					variant="ghost"
+					size="icon"
+					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘V" : "Ctrl+V"})`}
+				>
 					<ClipboardPasteIcon />
 				</TooltipButton>
 			</DialogTrigger>

@@ -58,6 +58,12 @@ export function ItemCard(props: {
 						props.asParent ? "bg-transparent shadow-none border-none" : "",
 					)}
 					onClick={() => setEditing(true)}
+					onKeyDown={(e) => {
+						if (e.key === "Backspace") {
+							e.preventDefault();
+							submitJson(item, "DELETE");
+						}
+					}}
 					draggable={!props.asParent}
 					onDragStart={onDragStart}
 				>

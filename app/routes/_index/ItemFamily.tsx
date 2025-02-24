@@ -1,12 +1,13 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useFetcher } from "react-router";
-import { Button } from "~/components/Button";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
+import { TooltipButton } from "~/components/TooltipButton";
+import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { useAcceptCardInsert, useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { type Item, itemSchema } from "~/map/models";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
@@ -54,6 +55,15 @@ export function ItemFamily(props: {
 		props.moveItem,
 	);
 
+	useKeyboardShortcut(["ctrl+e", "meta+e"], (e) => {
+		if (
+			document.activeElement &&
+			document.getElementById(item.id)?.contains(document.activeElement)
+		) {
+			submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT");
+		}
+	});
+
 	return (
 		<ContextMenu>
 			<div
@@ -61,6 +71,7 @@ export function ItemFamily(props: {
 				onDragOver={onDragOver}
 				onDragLeave={onDragLeave}
 				onDrop={onDrop}
+				id={item.id}
 			>
 				<ContextMenuTrigger className={styles.family}>
 					{!props.parent.isExpanded ? (
@@ -74,20 +85,21 @@ export function ItemFamily(props: {
 								)}
 							>
 								<ItemCard asParent item={item} className={cn(styles.self, "relative z-10")} />
-								<Button
+								<TooltipButton
 									type="button"
 									variant="ghost"
 									size="icon"
 									className={cn(styles.expand, "w-4 h-20 ml-auto")}
 									disabled={item.children.length === 0}
 									onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
+									tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
 								>
 									{item.children.length === 0 ? null : item.isExpanded ? (
 										<ChevronLeftIcon />
 									) : (
 										<ChevronRightIcon />
 									)}
-								</Button>
+								</TooltipButton>
 							</div>
 							<div
 								className={cn(

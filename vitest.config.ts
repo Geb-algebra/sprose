@@ -10,7 +10,7 @@ export default defineConfig({
 	test: {
 		include: ["./app/**/*.test.{ts,tsx}"],
 		globals: true,
-		environment: "node",
+		environment: "happy-dom",
 		restoreMocks: true,
 		sequence: {
 			shuffle: true,
