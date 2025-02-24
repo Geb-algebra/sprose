@@ -4,6 +4,7 @@ import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { MapRepository } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
+import { copyItemToClipboard } from "~/map/services/clipboard.client";
 import { cn } from "~/utils/css";
 import type { Route } from "./+types/route";
 import ClipboardCopy from "./ClipboardCopy";

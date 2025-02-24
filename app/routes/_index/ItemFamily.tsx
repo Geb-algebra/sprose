@@ -7,6 +7,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
+import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { useAcceptCardInsert, useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { type Item, itemSchema } from "~/map/models";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
@@ -54,6 +55,15 @@ export function ItemFamily(props: {
 		props.moveItem,
 	);
 
+	useKeyboardShortcut(["ctrl+e", "meta+e"], (e) => {
+		if (
+			document.activeElement &&
+			document.getElementById(item.id)?.contains(document.activeElement)
+		) {
+			submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT");
+		}
+	});
+
 	return (
 		<ContextMenu>
 			<div
@@ -61,6 +71,7 @@ export function ItemFamily(props: {
 				onDragOver={onDragOver}
 				onDragLeave={onDragLeave}
 				onDrop={onDrop}
+				id={item.id}
 			>
 				<ContextMenuTrigger className={styles.family}>
 					{!props.parent.isExpanded ? (
