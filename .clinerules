@@ -141,8 +141,8 @@ Based on the `biome.json` configuration:
 
 ### CSS/Styling
 
-- Tailwind CSS for utility-based styling
-- CSS modules for component-specific styles
+- CSS modules for defining layouts of an element and its children
+- Tailwind CSS for styling colors and shapes of elements
 - CSS variables for theming
 - Dark mode support
 - **Color Usage Rules**:
