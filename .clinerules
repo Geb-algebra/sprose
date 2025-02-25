@@ -15,7 +15,7 @@ Sprose is a hierarchical item management system built with React Router v7 and d
 - **Testing**: Vitest 3
 - **Type Checking**: TypeScript 5.7
 - **Linting/Formatting**: Biome 1.9.4
-- **UI Components**: Radix UI
+- **UI Components**: shadcn/ui but manually copy&pasted from its website, not installed via cli.
 
 ## Project Structure
 
