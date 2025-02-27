@@ -35,9 +35,13 @@ async function getChildFromClipboardAsHTML(): Promise<Item[] | null> {
 }
 
 export async function getChildFromClipboard(): Promise<Item[] | null> {
-	const clipboardItems = await navigator.clipboard.read().catch(() => []);
-	if (clipboardItems.length > 0 && clipboardItems[0].types.includes("text/html")) {
-		return getChildFromClipboardAsHTML();
+	try {
+		return await getChildFromClipboardAsMarkdown();
+	} catch (e) {
+		try {
+			return await getChildFromClipboardAsHTML();
+		} catch (e) {
+			throw new Error("Clipboard does not contain a valid item");
+		}
 	}
-	return getChildFromClipboardAsMarkdown();
 }

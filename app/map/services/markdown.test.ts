@@ -33,10 +33,27 @@ describe("parseMarkdownToMap", () => {
 		);
 	});
 
-	it("should handle an empty markdown string", () => {
-		const markdown = "";
+	it("should skip non-list items in markdown", () => {
+		const markdown = `Some text
+- Item 1
+  - Item 2
+More text
+- Item 3`;
 		const result = parseMarkdownToItem(markdown);
-		expect(result).toEqual(_rootItem());
+		expect(result).toEqual(
+			_rootItem([
+				_expectedItem({
+					description: "Item 1",
+					children: [_expectedItem({ description: "Item 2" })],
+				}),
+				_expectedItem({ description: "Item 3" }),
+			]),
+		);
+	});
+
+	it("should throw if there is no list item", () => {
+		const markdown = "hoge";
+		expect(() => parseMarkdownToItem(markdown)).toThrowError("No list items found in markdown");
 	});
 });
 
