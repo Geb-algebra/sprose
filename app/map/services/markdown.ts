@@ -7,6 +7,11 @@ export function parseMarkdownToItem(markdown: string): Item {
 	const stack: { item: Item; level: number }[] = [];
 
 	for (const line of lines) {
+		// Skip lines that don't look like list items
+		if (!line.trim().match(/^\s*-/)) {
+			continue;
+		}
+
 		const level = line.match(/^\s*/)?.[0].length || 0;
 		const description = line.replace(/^\s*-\s*/, "").trim();
 		const newItem: Item = createNewItem(description);
@@ -22,6 +27,10 @@ export function parseMarkdownToItem(markdown: string): Item {
 		}
 
 		stack.push({ item: newItem, level });
+	}
+
+	if (rootItems.length === 0) {
+		throw new Error("No list items found in markdown");
 	}
 
 	return {

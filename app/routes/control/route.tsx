@@ -48,7 +48,7 @@ export function Control(props: { map: Item; className?: string }) {
 					variant="ghost"
 					size="icon"
 					value="undo"
-					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘Z" : "Ctrl+Z"})`}
+					tooltip={`Undo (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘Z" : "Ctrl+Z"})`}
 				>
 					<UndoIcon />
 				</TooltipButton>
@@ -58,7 +58,7 @@ export function Control(props: { map: Item; className?: string }) {
 					variant="ghost"
 					size="icon"
 					value="redo"
-					tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘⇧Z" : "Ctrl+Shift+Z"})`}
+					tooltip={`Redo (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘⇧Z" : "Ctrl+Shift+Z"})`}
 				>
 					<RedoIcon />
 				</TooltipButton>

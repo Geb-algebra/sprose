@@ -28,7 +28,7 @@ export default function ClipboardCopy(props: { map: Item }) {
 				copyItemToClipboard(props.map);
 				toast("Copied to clipboard!");
 			}}
-			tooltip={`Paste from clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘C" : "Ctrl+C"})`}
+			tooltip={`Copy to clipboard (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘C" : "Ctrl+C"})`}
 		>
 			<ClipboardCopyIcon />
 		</TooltipButton>

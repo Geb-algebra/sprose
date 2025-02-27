@@ -26,7 +26,9 @@ export function AddItemButton(props: {
 		<div
 			className={cn(
 				props.className,
-				props.parent.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
+				props.parent.children.length === 0 || !props.parent.isExpanded
+					? styles.collapsedLayout
+					: styles.expandedLayout,
 			)}
 			onDragOver={onDragOver}
 			onDragLeave={onDragLeave}
@@ -34,7 +36,7 @@ export function AddItemButton(props: {
 		>
 			<div
 				className={cn(
-					inserterShape(props.parent.isExpanded),
+					inserterShape(props.parent.children.length === 0 ? false : props.parent.isExpanded),
 					insertAt !== "before" && "hidden",
 					"bg-secondary rounded-lg",
 				)}
@@ -74,7 +76,11 @@ export function AddItemButton(props: {
 					+
 				</button>
 			) : (
-				<div className={cn(inserterShape(props.parent.isExpanded))}>
+				<div
+					className={cn(
+						inserterShape(props.parent.children.length === 0 ? false : props.parent.isExpanded),
+					)}
+				>
 					<button
 						ref={addButton}
 						type="button"

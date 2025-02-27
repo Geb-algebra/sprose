@@ -80,7 +80,7 @@ export function createNewItem(description: string, id?: string): Item {
 	return {
 		id: id ?? generateId(),
 		description,
-		isExpanded: false,
+		isExpanded: true,
 		children: [],
 	};
 }

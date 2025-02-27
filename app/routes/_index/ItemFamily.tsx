@@ -81,10 +81,10 @@ export function ItemFamily(props: {
 							<div
 								className={cn(
 									styles.header,
-									"bg-card h-[120%] w-full flex rounded-t-lg border shadow-sm items-start",
+									"bg-card h-[120%] w-full flex rounded-t-lg border shadow-sm items-start relative",
 								)}
 							>
-								<ItemCard asParent item={item} className={cn(styles.self, "relative z-10")} />
+								<ItemCard asParent item={item} className={cn(styles.self, "sticky left-0")} />
 								<TooltipButton
 									type="button"
 									variant="ghost"
@@ -105,7 +105,7 @@ export function ItemFamily(props: {
 								className={cn(
 									item.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
 									styles.children,
-									"p-2 rounded-xl border-x border-t inset-shadow-xs bg-background",
+									"p-2 rounded-xl border-x border-t inset-shadow-xs bg-background z-10",
 								)}
 							>
 								{item.children.map((child, siblingIndex) => (
