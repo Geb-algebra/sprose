@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-Sprose is a hierarchical item management system built with React Router v7 and designed to be deployed to Cloudflare Workers. It allows users to create, edit, move, and organize items in a tree structure, with support for copying and pasting items as Markdown or HTML.
+Sprose is a tool to spread users thoughts by writing what they think on many cards and organize these cards hierarchically to clarify what the users think.
+It helps users to write drafts of articles, user story maps, plannings etc.
+It built with React Router v7 and designed to be deployed to Cloudflare Workers. It allows users to create, edit, move, and organize items in a tree structure, with support for copying and pasting items as Markdown or HTML.
 
 ## Technology Stack
 
