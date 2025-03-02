@@ -312,3 +312,15 @@ The project implements several recursive tree operations:
   - Define models first
   - Implement services as pure functions
   - Use repositories for storage operations
+
+## HTML Serialization Patterns
+
+### Compact HTML Output
+
+The project generates compact HTML without whitespace for efficiency:
+
+- **No newlines or indentation** in HTML output from `richtext.ts`
+- Compact representation: `<ul><li>Item 1</li><li>Item 2<ul><li>Item 2.1</li></ul></li></ul>`
+- Parser remains whitespace-tolerant when reading input HTML
+
+This approach optimizes storage and transmission while maintaining compatibility with various input formats. Used for clipboard operations and data exchange.

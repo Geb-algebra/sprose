@@ -4,21 +4,7 @@ import { _expectedItem, _item, _rootItem } from "./test-utils";
 
 describe("parseHTMLListToItem", () => {
 	it("should parse HTML list to item", async () => {
-		const html = `
-      <ul>
-        <li>Item 1</li>
-        <li>Item 2
-          <ul>
-            <li>Item 2.1
-              <ul>
-                <li>Item 2.1.1</li>
-              </ul>
-            </li>
-            <li>Item 2.2</li>
-          <ul>
-        </li>
-        <li>Item 3</li>
-      </ul>
+		const html = `<ul><li>Item 1</li><li>Item 2<ul><li>Item 2.1<ul><li>Item 2.1.1</li></ul></li><li>Item 2.2</li><ul></li><li>Item 3</li></ul>
     `;
 		const item = await parseHTMLListToItem(html);
 		expect(item).toEqual(
@@ -104,20 +90,7 @@ describe("serializeItemToHTML", () => {
 		]);
 		const html = serializeItemToHTML(item);
 		expect(html).toBe(
-			`<ul>
-  <li>Item 1</li>
-  <li>Item 2
-    <ul>
-      <li>Item 2.1
-        <ul>
-          <li>Item 2.1.1</li>
-        </ul>
-      </li>
-      <li>Item 2.2</li>
-    </ul>
-  </li>
-  <li>Item 3</li>
-</ul>`,
+			"<ul><li>Item 1</li><li>Item 2<ul><li>Item 2.1<ul><li>Item 2.1.1</li></ul></li><li>Item 2.2</li></ul></li><li>Item 3</li></ul>",
 		);
 	});
 });

@@ -5,12 +5,11 @@ const cardType = "application/item-card";
 type InsertAt = "none" | "before" | "after";
 
 export function useStartCardInsert(item: Item) {
-	function onDragStart(e: React.DragEvent) {
+	return (e: React.DragEvent) => {
 		e.stopPropagation();
 		e.dataTransfer.effectAllowed = "move";
 		e.dataTransfer.setData(cardType, JSON.stringify(item));
-	}
-	return onDragStart;
+	};
 }
 
 export function useAcceptCardInsert(
@@ -26,46 +25,44 @@ export function useAcceptCardInsert(
 ) {
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
 
-	function onDragOver(e: React.DragEvent) {
-		e.preventDefault();
-		e.stopPropagation();
-		const rect = e.currentTarget.getBoundingClientRect();
-		setInsertAt(
-			judgeDropPlace({
-				rect,
-				clientX: e.clientX,
-				clientY: e.clientY,
-				insertAt,
-			}),
-		);
-	}
+	const handlers = {
+		onDragOver: (e: React.DragEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+			setInsertAt(
+				judgeDropPlace({
+					rect: e.currentTarget.getBoundingClientRect(),
+					clientX: e.clientX,
+					clientY: e.clientY,
+					insertAt,
+				}),
+			);
+		},
 
-	function onDragLeave() {
-		setInsertAt("none");
-	}
+		onDragLeave: () => setInsertAt("none"),
 
-	function onDrop(e: React.DragEvent) {
-		e.preventDefault();
-		e.stopPropagation();
-		const data = e.dataTransfer.getData("application/item-card");
-		const item = itemSchema.parse(JSON.parse(data));
-		const siblingIndexAfterItemLeft =
-			parent.children.some((c) => c.id === item.id) &&
-			parent.children.findIndex((child) => child.id === item.id) < siblingIndex
-				? siblingIndex - 1
-				: siblingIndex;
-		moveItem(
-			item.id,
-			parent.id,
-			insertAt === "before" ? siblingIndexAfterItemLeft : siblingIndexAfterItemLeft + 1,
-		);
-		setInsertAt("none");
-	}
+		onDrop: (e: React.DragEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+			try {
+				const item = itemSchema.parse(JSON.parse(e.dataTransfer.getData(cardType)));
+				// Calculate index adjustment if moving within the same parent
+				const siblingIndexAfterItemLeft =
+					parent.children.some((c) => c.id === item.id) &&
+					parent.children.findIndex((child) => child.id === item.id) < siblingIndex
+						? siblingIndex - 1
+						: siblingIndex;
 
-	return {
-		insertAt,
-		onDragOver,
-		onDragLeave,
-		onDrop,
+				moveItem(
+					item.id,
+					parent.id,
+					insertAt === "before" ? siblingIndexAfterItemLeft : siblingIndexAfterItemLeft + 1,
+				);
+			} finally {
+				setInsertAt("none");
+			}
+		},
 	};
+
+	return { insertAt, ...handlers };
 }
