@@ -160,3 +160,61 @@ flowchart TD
 The format is flexible - focus on capturing valuable insights that help me work more effectively with you and the project. Think of notes.md as a living document that grows smarter as we work together.
 
 REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.
+
+# General Coding Rules
+
+This is a set of rules you have to follow
+
+## employed technologies
+
+- Typescript for implementing an entire project
+- React: for implementing UI
+- Vite: bundler
+- react router v7 (formerly remix)
+- zod: for validating domain objects
+- drizzle: as an ORM
+- hono: for HTTP server
+- tailwind css: for styling shapes and colors of HTML elements and texts (not used for defining layouts and placements of elements)
+- css modules: for defining layouts and placements of elements (not used for styling shapes and colors)
+
+## design rules
+
+Every project should follow the manners of domain driven design. Specifically,
+
+- Create a dedicated directory for each domain.
+- Domain objects should be implemented, as a type in `models.ts` file in the domain directory. These objects must be defined with pure typescript, without relying on any libraries like zod or drizzle. Generally they should be just a type, not a class with constructors or methods, to avoid they mutate themselves, but sometimes it is not the case.
+- For each domain object, a Factory class should be defined. This class ensures that the domain objects will be created with right type, right default value
+- For each domain object, a Repository class, which fetch domain objects of a specific kind from and save them to storages, should be implemented. This class have no properties and only have static methods such as `get` and `save`. This class just pass objects as they are and must not have any business logic.
+- All business logics should be implemented as Services, pure functions defined in `services.ts` in the domain directory. Services must not have states and must not mutate arguments. Generally Services accept a domain object as an argument and return updated version of it. When doing this, services have to return an updated copy of the accepted object instead of mutate it. Services never use Repositories that means that they don’t touch storage at all. Getting objects from storage and saving it is done outside Services. All services should be tested by unit tests.
+- Route components can’t use Services and can’t include any other business logics. Instead, `loader, action, clientLoader` and `clientAction` use Repositories and Services to pass domain objects that Route components requested and mutate domain objects as Route components  requested. Route components can just render domain objects they get and send the request to run some services, often with user inputs.
+- Each component used in Route components should have entire responsibility to the domain objects they render. Specifically, they accept a set of domain objects they render and send requests for mutating them directly to action functions.
+
+Only the operator can add, update and delete Domain objects. You should not do that.
+If you think you have to make some changes to domain objects, you have to ask the operator to do that.
+
+## Flowchart for development
+
+```mermaid
+
+graph TD
+    start[Operator creates and updates domain objects] --> op_ask[Operator asks you to implement]
+    op_ask --> plan[Plan what you will do and list and describe all Factories, Repositories, and Services to create or update]
+    plan --> rev_plan[Operator reviews your plan]
+    rev_plan --> plan_approved{Operator approved your plan?}
+    plan_approved --> |Yes|write_tests[Write unit tests for all Factories, Repositories, and Services]
+    plan_approved --> |No|fix_plan[Fix your plan following the operator's comments]
+    fix_plan --> rev_plan
+    write_tests --> rev_tests[Operator reviews your tests]
+    rev_tests --> tests_approved{Operator approved your tests?}
+    tests_approved --> |Yes|implement_feature[Implement the feature]
+    tests_approved --> |No|fix_tests[Fix your tests following the operator's comments]
+    fix_tests --> rev_tests
+    implement_feature --> run_tests[Run tests]
+    run_tests --> pass{Did all tests pass?}
+    pass --> |Yes|complete[Feature implementation complete]
+    pass --> |No|have_you_tried_to_fix_implementation_for_5_times{Have you tried to fix the implementation for 5 times?}
+    have_you_tried_to_fix_implementation_for_5_times --> |Yes|ask_operator_for_help[Ask the operator for help]
+    have_you_tried_to_fix_implementation_for_5_times --> |No|fix_implementation[Fix the implementation]
+    ask_operator_for_help --> fix_implementation
+    fix_implementation --> run_tests
+```
