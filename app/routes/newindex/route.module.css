@@ -1,0 +1,37 @@
+.bodyLayout {
+	width: 100%;
+	height: 100vh;
+	padding: 8px;
+	display: grid;
+	grid-template-columns: 1fr 160px 1fr;
+	grid-template-rows: auto 1fr;
+	gap: 8px;
+	grid-template-areas:
+		"title control ."
+		"main main main";
+}
+
+.title {
+	grid-area: title;
+}
+
+.fileUpload {
+	grid-area: file-upload;
+}
+
+.export {
+	grid-area: export;
+}
+
+.control {
+	grid-area: control;
+}
+
+.main {
+	grid-area: main;
+}
+
+.mainLayout {
+	display: flex;
+	gap: 8px;
+}

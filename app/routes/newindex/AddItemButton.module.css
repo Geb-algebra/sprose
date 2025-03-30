@@ -1,0 +1,21 @@
+.collapsedLayout {
+	display: grid;
+	gap: 8px 16px;
+	align-items: start;
+	align-content: start;
+}
+
+.expandedLayout {
+	display: grid;
+	gap: 8px 16px;
+	justify-items: start;
+	grid-auto-flow: column;
+}
+
+.content {
+	grid-area: content;
+}
+
+.insert {
+	grid-area: insert;
+}
