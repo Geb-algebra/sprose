@@ -17,7 +17,7 @@ export function addNewItem(parentId: string, map: Item, newItem: Item, at = 1000
 	if (parentId === map.id) {
 		return {
 			...map,
-			children: [...map.children.slice(0, at), newItem, ...map.children.slice(at, 10000000000000)],
+			children: [...map.children.slice(0, at), newItem, ...map.children.slice(at)],
 		};
 	}
 	return {
@@ -31,7 +31,7 @@ export function moveItem(
 	targetParentId: string,
 	targetSiblingIndex: number,
 	map: Item,
-) {
+): Item {
 	const movedItem = findChildById(map, movedItemId);
 	if (!movedItem) {
 		return map;
@@ -54,30 +54,41 @@ export function deleteItem(itemId: string, item: Item): Item {
 	};
 }
 
-export function findChildById(item: Item, id: string): Item | null {
-	if (item.id === id) {
-		return item;
-	}
+/**
+ * Generic tree traversal utility that performs depth-first search on an Item tree.
+ *
+ * This function traverses the tree and applies a predicate function to each node.
+ * When the predicate returns a non-null value for a node, the traversal for that branch
+ * stops and the result is returned (optionally processed by childProcessor).
+ *
+ * @template T The type of result returned by the predicate and the function
+ * @param item The root item from which to start the traversal
+ * @param predicate Function that evaluates each node and returns a result (T) if found, or null if not
+ * @returns The first non-null result from the predicate, optionally transformed by childProcessor, or null if not found
+ *
+ * @example
+ * // Find an item by ID
+ * const item = findInTree(root, node => node.id === targetId ? node : null);
+ */
+function findInTree<T>(item: Item, predicate: (item: Item) => T | null): T | null {
+	const result = predicate(item);
+	if (result) return result;
+
 	for (const child of item.children) {
-		const found = findChildById(child, id);
-		if (found) {
-			return found;
+		const childResult = findInTree(child, predicate);
+		if (childResult) {
+			return childResult;
 		}
 	}
 	return null;
 }
 
+export function findChildById(item: Item, id: string): Item | null {
+	return findInTree(item, (node) => (node.id === id ? node : null));
+}
+
 export function findParentByChildId(item: Item, id: string): Item | null {
-	for (const child of item.children) {
-		if (child.id === id) {
-			return item;
-		}
-		const found = findParentByChildId(child, id);
-		if (found) {
-			return found;
-		}
-	}
-	return null;
+	return findInTree(item, (node) => (node.children.some((child) => child.id === id) ? node : null));
 }
 
 export {
