@@ -22,7 +22,7 @@ export function HorizontalDropAcceptor(props: {
 				props.className,
 				insertAt === "before" && "border-l-2 border-l-primary",
 				insertAt === "after" && "border-r-2 border-r-primary",
-				insertAt === "into" && "border-2 border-dashed border-primary",
+				insertAt === "into" && "rounded-lg border-2 border-dashed border-primary",
 			)}
 			onDragOver={(e) => {
 				e.preventDefault();
@@ -88,7 +88,7 @@ export function VerticalDropAcceptor(props: {
 				props.className,
 				insertAt === "before" && "border-t-2 border-t-primary",
 				insertAt === "after" && "border-b-2 border-b-primary",
-				insertAt === "into" && "border-2 border-dashed border-primary",
+				insertAt === "into" && "rounded-lg border-2 border-dashed border-primary",
 			)}
 			onDragOver={(e) => {
 				e.preventDefault();

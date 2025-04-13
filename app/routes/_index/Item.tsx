@@ -1,8 +1,16 @@
 import React from "react";
 import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "~/components/ContextMenu";
 import { VerticalDropAcceptor } from "~/components/DragDrop";
 import { type Item, itemSchema } from "~/map/models";
+import { copyItemToClipboard } from "~/map/services/clipboard.client";
+import { getChildFromClipboard } from "~/map/services/clipboard.client";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 
 export function ItemCard(props: {
@@ -70,14 +78,37 @@ export function ItemCard(props: {
 	return props.asParent ? (
 		<div className={cn(props.className)}>{content}</div>
 	) : (
-		<VerticalDropAcceptor
-			parent={props.parent}
-			siblingIndex={props.siblingIndex}
-			moveItem={props.moveItem}
-			disabledInsertAt={[]}
-			className={cn(props.className, "mx-1")}
-		>
-			{content}
-		</VerticalDropAcceptor>
+		<ContextMenu>
+			<VerticalDropAcceptor
+				parent={props.parent}
+				siblingIndex={props.siblingIndex}
+				moveItem={props.moveItem}
+				disabledInsertAt={[]}
+				className={cn(props.className, "mx-1")}
+			>
+				<ContextMenuTrigger>{content}</ContextMenuTrigger>
+			</VerticalDropAcceptor>
+			<ContextMenuContent className="w-64">
+				<ContextMenuItem onClick={() => copyItemToClipboard(item)}>
+					Copy Markdown List
+				</ContextMenuItem>
+				<ContextMenuItem
+					onClick={async () => {
+						const newChildren = await getChildFromClipboard();
+						if (newChildren) {
+							submitJson({ ...item, children: [...item.children, ...newChildren] }, "PUT");
+						}
+					}}
+				>
+					Paste Markdown List as Child
+				</ContextMenuItem>
+				<ContextMenuItem
+					className="text-destructive focus:bg-destructive-foreground"
+					onClick={() => submitJson(item, "DELETE")}
+				>
+					Delete
+				</ContextMenuItem>
+			</ContextMenuContent>
+		</ContextMenu>
 	);
 }

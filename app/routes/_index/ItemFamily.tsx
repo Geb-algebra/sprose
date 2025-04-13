@@ -74,7 +74,7 @@ export function ItemFamily(props: {
 								type="button"
 								variant="ghost"
 								size="icon"
-								className={cn("w-4 h-9 ml-auto")}
+								className={cn("w-4 h-9 ml-auto sticky right-0")}
 								disabled={item.children.length === 0}
 								onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
 								tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
@@ -119,8 +119,31 @@ export function ItemFamily(props: {
 				</ContextMenuTrigger>
 			</DropAcceptor>
 			<ContextMenuContent className="w-64">
+				<ContextMenuItem
+					onClick={() =>
+						submitJson(
+							{
+								...item,
+								children: item.children.map((child) => ({ ...child, isExpanded: false })),
+							},
+							"PUT",
+						)
+					}
+				>
+					Collapse All Children
+				</ContextMenuItem>
+				<ContextMenuItem
+					onClick={() =>
+						submitJson(
+							{ ...item, children: item.children.map((child) => ({ ...child, isExpanded: true })) },
+							"PUT",
+						)
+					}
+				>
+					Expand All Children
+				</ContextMenuItem>
 				<ContextMenuItem onClick={() => copyItemToClipboard(item)}>
-					Copy as Markdown List
+					Copy Markdown List
 				</ContextMenuItem>
 				<ContextMenuItem
 					onClick={async () => {

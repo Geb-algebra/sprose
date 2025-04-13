@@ -72,7 +72,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 						className={cn(
 							styles.main,
 							styles.mainLayout,
-							"rounded-2xl bg-background shadow-md px-1 py-2 overflow-auto",
+							"rounded-2xl bg-background shadow-md py-1 overflow-auto",
 						)}
 					>
 						{groupChildren(map).map((group) => {
@@ -108,27 +108,45 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 								/>
 							);
 						})}
-						{map.children.length === 0 && (
-							<AddItemButton
-								parent={map}
-								addItem={(addedChild: Item) => {
-									submitJson({
-										...map,
-										children: [...map.children, addedChild],
-									});
-								}}
-								moveItem={(
-									movedItemId: string,
-									targetParentId: string,
-									targetSiblingIndex: number,
-								) => {
-									submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
-								}}
-							/>
-						)}
+						<AddItemButton
+							parent={map}
+							addItem={(addedChild: Item) => {
+								submitJson({
+									...map,
+									children: [...map.children, addedChild],
+								});
+							}}
+							moveItem={(
+								movedItemId: string,
+								targetParentId: string,
+								targetSiblingIndex: number,
+							) => {
+								submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
+							}}
+						/>
 					</main>
 				</ContextMenuTrigger>
 				<ContextMenuContent className="w-64">
+					<ContextMenuItem
+						onClick={() =>
+							submitJson({
+								...map,
+								children: map.children.map((child) => ({ ...child, isExpanded: false })),
+							})
+						}
+					>
+						Collapse All Children
+					</ContextMenuItem>
+					<ContextMenuItem
+						onClick={() =>
+							submitJson({
+								...map,
+								children: map.children.map((child) => ({ ...child, isExpanded: true })),
+							})
+						}
+					>
+						Expand All Children
+					</ContextMenuItem>
 					<ContextMenuItem onClick={() => copyItemToClipboard(map)}>
 						Copy as Markdown List
 					</ContextMenuItem>
