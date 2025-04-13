@@ -53,43 +53,37 @@ export function ItemFamily(props: {
 				className={cn(props.className, "mx-1")}
 			>
 				<ContextMenuTrigger>
-					{!props.parent.isExpanded ? (
-						<ItemCard
-							parent={props.parent}
-							siblingIndex={props.siblingIndex}
-							moveItem={props.moveItem}
-							asParent={true}
-						/>
-					) : (
-						<div className="grid">
-							<div
-								className={cn(
-									"h-[120%] w-full flex rounded-t-lg border shadow-sm items-start relative bg-parent-card",
-								)}
+					<div className="grid">
+						<div
+							className={cn(
+								"w-full h-full flex rounded-lg border shadow-sm items-start relative bg-parent-card",
+								item.isExpanded && "h-[120%] rounded-b-none",
+							)}
+						>
+							<ItemCard
+								parent={props.parent}
+								siblingIndex={props.siblingIndex}
+								moveItem={props.moveItem}
+								className={cn("sticky left-0 border-none shadow-none")}
+								asParent={true}
+							/>
+							<TooltipButton
+								type="button"
+								variant="ghost"
+								size="icon"
+								className={cn("w-4 h-9 ml-auto")}
+								disabled={item.children.length === 0}
+								onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
+								tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
 							>
-								<ItemCard
-									parent={props.parent}
-									siblingIndex={props.siblingIndex}
-									moveItem={props.moveItem}
-									className={cn("sticky left-0 border-none shadow-none")}
-									asParent={true}
-								/>
-								<TooltipButton
-									type="button"
-									variant="ghost"
-									size="icon"
-									className={cn("w-4 h-9 ml-auto")}
-									disabled={item.children.length === 0}
-									onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
-									tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
-								>
-									{item.children.length === 0 ? null : item.isExpanded ? (
-										<ChevronLeftIcon />
-									) : (
-										<ChevronRightIcon />
-									)}
-								</TooltipButton>
-							</div>
+								{item.children.length === 0 ? null : item.isExpanded ? (
+									<ChevronLeftIcon />
+								) : (
+									<ChevronRightIcon />
+								)}
+							</TooltipButton>
+						</div>
+						{item.isExpanded ? (
 							<div
 								className={cn(
 									"flex py-2 rounded-xl border-x border-t inset-shadow-sm bg-background z-10",
@@ -117,8 +111,8 @@ export function ItemFamily(props: {
 									);
 								})}
 							</div>
-						</div>
-					)}
+						) : null}
+					</div>
 				</ContextMenuTrigger>
 			</DropAcceptor>
 			<ContextMenuContent className="w-64">

@@ -3,6 +3,7 @@ import type { Item } from "~/map/models";
 import { AddItemButton } from "./AddItemButton";
 import styles from "./ChildrenBox.module.css";
 import { ItemCard } from "./Item";
+import { ItemFamily } from "./ItemFamily";
 import type { ItemGroup } from "./group-children";
 
 export function ChildrenBox(props: {
@@ -22,15 +23,24 @@ export function ChildrenBox(props: {
 		<div className={styles.layout}>
 			{props.parent.children
 				.slice(props.startSiblingIndex, props.nextStartSiblingIndex)
-				.map((item, index) => (
-					<ItemCard
-						key={item.id}
-						parent={props.parent}
-						siblingIndex={props.startSiblingIndex + index}
-						moveItem={props.moveItem}
-						asParent={false}
-					/>
-				))}
+				.map((item, index) =>
+					item.children.length !== 0 ? (
+						<ItemFamily
+							key={item.id}
+							parent={props.parent}
+							siblingIndex={props.startSiblingIndex + index}
+							moveItem={props.moveItem}
+						/>
+					) : (
+						<ItemCard
+							key={item.id}
+							parent={props.parent}
+							siblingIndex={props.startSiblingIndex + index}
+							moveItem={props.moveItem}
+							asParent={false}
+						/>
+					),
+				)}
 			<AddItemButton
 				parent={props.parent}
 				addItem={(addedChild: Item) => {
