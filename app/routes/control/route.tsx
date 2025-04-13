@@ -40,7 +40,7 @@ export function Control(props: { map: Item; className?: string }) {
 	);
 
 	return (
-		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>
+		<div className={cn(props.className, "flex bg-background shadow-sm rounded-xl w-fit p-2")}>
 			<fetcher.Form action="/control" method="post" className="flex w-fit">
 				<TooltipButton
 					type="submit"

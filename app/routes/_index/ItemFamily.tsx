@@ -6,13 +6,12 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import { HorizontalDropAcceptor, VerticalDropAcceptor } from "~/components/DragDrop";
 import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { type Item, itemSchema } from "~/map/models";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
-import { cn, inserterShape } from "~/utils/css";
-import { AddItemButton } from "./AddItemButton";
+import { HorizontalDropAcceptor, VerticalDropAcceptor } from "~/routes/_index/DragDrop";
+import { cn } from "~/utils/css";
 import { ChildrenBox } from "./ChildrenBox";
 import { ItemCard } from "./Item";
 import { groupChildren } from "./group-children";
@@ -21,7 +20,6 @@ export function ItemFamily(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
-	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void;
 }) {
 	const fetcher = useFetcher();
 	function submitJson(newItem: Item, method: "PUT" | "DELETE") {
@@ -51,7 +49,6 @@ export function ItemFamily(props: {
 			<DropAcceptor
 				parent={props.parent}
 				siblingIndex={props.siblingIndex}
-				moveItem={props.moveItem}
 				className={cn(props.className, "mx-1")}
 				disabledInsertAt={item.isExpanded ? ["into"] : []}
 			>
@@ -66,7 +63,6 @@ export function ItemFamily(props: {
 							<ItemCard
 								parent={props.parent}
 								siblingIndex={props.siblingIndex}
-								moveItem={props.moveItem}
 								className={cn("sticky left-0 border-none shadow-none")}
 								asParent={true}
 							/>
@@ -99,7 +95,6 @@ export function ItemFamily(props: {
 												key={group.startSiblingIndex}
 												parent={item}
 												siblingIndex={group.startSiblingIndex}
-												moveItem={props.moveItem}
 											/>
 										);
 									}
@@ -109,7 +104,6 @@ export function ItemFamily(props: {
 											parent={item}
 											startSiblingIndex={group.startSiblingIndex}
 											nextStartSiblingIndex={group.nextStartSiblingIndex}
-											moveItem={props.moveItem}
 										/>
 									);
 								})}

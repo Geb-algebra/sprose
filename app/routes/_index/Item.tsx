@@ -1,28 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useFetcher } from "react-router";
-import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import { VerticalDropAcceptor } from "~/components/DragDrop";
+import { createNewItem } from "~/map/lifecycle";
 import { type Item, itemSchema } from "~/map/models";
 import { copyItemToClipboard } from "~/map/services/clipboard.client";
 import { getChildFromClipboard } from "~/map/services/clipboard.client";
+import { BlurOnEnterTextArea } from "~/routes/_index/BlurOnEnterTextArea";
+import { VerticalDropAcceptor } from "~/routes/_index/DragDrop";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
+import { addingItemContext, mapContext } from "./context";
 
 export function ItemCard(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
-	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void;
 	asParent?: boolean;
 }) {
 	const fetcher = useFetcher();
-	function submitJson(map: Item, method: "PUT" | "DELETE") {
-		fetcher.submit(map, {
+	const { addingItemId, setAddingItemId } = useContext(addingItemContext);
+	async function submitJson(map: Item, method: "PUT" | "DELETE") {
+		await fetcher.submit(map, {
 			method,
 			encType: "application/json",
 		});
@@ -31,7 +33,7 @@ export function ItemCard(props: {
 	const item = possiblyNewItem.success
 		? possiblyNewItem.data
 		: props.parent.children[props.siblingIndex];
-	const [editing, setEditing] = React.useState(false);
+	const [editing, setEditing] = React.useState(addingItemId === item.id);
 
 	const content = editing ? (
 		<BlurOnEnterTextArea
@@ -44,9 +46,39 @@ export function ItemCard(props: {
 			defaultValue={item.description}
 			onBlur={(e) => {
 				if (e.target.value.trim() !== "") {
-					submitJson({ ...item, description: e.target.value }, "PUT");
+					let newChildren: Item[];
+					if (addingItemId === item.id) {
+						const newItem = createNewItem("");
+						newChildren = [
+							...props.parent.children.slice(0, props.siblingIndex),
+							{
+								...item,
+								description: e.target.value,
+							},
+							newItem,
+							...props.parent.children.slice(props.siblingIndex + 1),
+						];
+						setAddingItemId(newItem.id);
+					} else {
+						newChildren = [
+							...props.parent.children.slice(0, props.siblingIndex),
+							{
+								...item,
+								description: e.target.value,
+							},
+							...props.parent.children.slice(props.siblingIndex + 1),
+						];
+					}
+					submitJson(
+						{
+							...props.parent,
+							children: newChildren,
+						},
+						"PUT",
+					);
 				} else {
 					submitJson(item, "DELETE");
+					setAddingItemId(null);
 				}
 				setEditing(false);
 			}}
@@ -82,7 +114,6 @@ export function ItemCard(props: {
 			<VerticalDropAcceptor
 				parent={props.parent}
 				siblingIndex={props.siblingIndex}
-				moveItem={props.moveItem}
 				disabledInsertAt={[]}
 				className={cn(props.className, "mx-1")}
 			>

@@ -1,4 +1,5 @@
-import { ClipboardPasteIcon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
+import { useContext } from "react";
 import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import {
@@ -11,8 +12,9 @@ import {
 	DialogTrigger,
 } from "~/components/Dialog";
 import { TooltipButton } from "~/components/TooltipButton";
+import { createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { getChildFromClipboard } from "~/map/services/clipboard.client";
+import { addingItemContext } from "../_index/context";
 
 export default function ClipboardPaste(props: { map: Item }) {
 	const fetcher = useFetcher();
@@ -32,10 +34,11 @@ export default function ClipboardPaste(props: { map: Item }) {
 					<Button
 						variant="destructive"
 						onClick={async () => {
+							const newItem = createNewItem("");
 							fetcher.submit(
 								{
 									...props.map,
-									children: [],
+									children: [newItem],
 								},
 								{
 									method: "PUT",
