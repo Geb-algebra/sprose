@@ -1,7 +1,7 @@
 import React from "react";
 import { useFetcher } from "react-router";
 import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
-import { DropAcceptor } from "~/components/DragDrop";
+import { VerticalDropAcceptor } from "~/components/DragDrop";
 import { type Item, itemSchema } from "~/map/models";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
 
@@ -70,13 +70,14 @@ export function ItemCard(props: {
 	return props.asParent ? (
 		<div className={cn(props.className)}>{content}</div>
 	) : (
-		<DropAcceptor
+		<VerticalDropAcceptor
 			parent={props.parent}
 			siblingIndex={props.siblingIndex}
 			moveItem={props.moveItem}
+			disabledInsertAt={[]}
 			className={cn(props.className, "mx-1")}
 		>
 			{content}
-		</DropAcceptor>
+		</VerticalDropAcceptor>
 	);
 }

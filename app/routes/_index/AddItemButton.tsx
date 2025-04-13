@@ -14,7 +14,7 @@ export function AddItemButton(props: {
 	const [writing, setWriting] = React.useState(false);
 	const addButton = React.useRef<HTMLButtonElement | null>(null);
 	return (
-		<div className={cn(props.className, "px-2")}>
+		<div className={cn(props.className, "px-2 py-1")}>
 			{writing ? (
 				<BlurOnEnterTextArea
 					className={cn(

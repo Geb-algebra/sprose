@@ -6,7 +6,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import { DropAcceptor } from "~/components/DragDrop";
+import { HorizontalDropAcceptor, VerticalDropAcceptor } from "~/components/DragDrop";
 import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
 import { type Item, itemSchema } from "~/map/models";
@@ -44,6 +44,8 @@ export function ItemFamily(props: {
 		}
 	});
 
+	const DropAcceptor = item.isExpanded ? HorizontalDropAcceptor : VerticalDropAcceptor;
+
 	return (
 		<ContextMenu>
 			<DropAcceptor
@@ -51,6 +53,7 @@ export function ItemFamily(props: {
 				siblingIndex={props.siblingIndex}
 				moveItem={props.moveItem}
 				className={cn(props.className, "mx-1")}
+				disabledInsertAt={item.isExpanded ? ["into"] : []}
 			>
 				<ContextMenuTrigger>
 					<div className="grid">
@@ -86,7 +89,7 @@ export function ItemFamily(props: {
 						{item.isExpanded ? (
 							<div
 								className={cn(
-									"flex py-2 rounded-xl border-x border-t inset-shadow-sm bg-background z-10",
+									"flex py-1 rounded-xl border-x border-t inset-shadow-sm bg-background z-10",
 								)}
 							>
 								{groupChildren(item).map((group) => {
