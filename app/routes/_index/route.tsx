@@ -16,7 +16,10 @@ import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipb
 import { Control } from "~/routes/control/route";
 import type { Route } from "./+types/route";
 import { AddItemButton } from "./AddItemButton";
+import { ChildrenBox } from "./ChildrenBox";
+import { ItemCard } from "./Item";
 import { ItemFamily } from "./ItemFamily";
+import { groupChildren } from "./group-children";
 
 export async function clientLoader() {
 	return await MapRepository.get();
@@ -69,23 +72,42 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 						className={cn(
 							styles.main,
 							styles.mainLayout,
-							"rounded-2xl bg-background shadow-md p-2 overflow-auto",
+							"rounded-2xl bg-background shadow-md py-1 overflow-auto",
 						)}
 					>
-						{map.children.map((item, siblingIndex) => (
-							<ItemFamily
-								key={item.id}
-								parent={map}
-								siblingIndex={siblingIndex}
-								moveItem={(
-									movedItemId: string,
-									targetParentId: string,
-									targetSiblingIndex: number,
-								) => {
-									submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
-								}}
-							/>
-						))}
+						{groupChildren(map).map((group) => {
+							if (group.type === "parent") {
+								return (
+									<ItemFamily
+										key={group.startSiblingIndex}
+										parent={map}
+										siblingIndex={group.startSiblingIndex}
+										moveItem={(
+											movedItemId: string,
+											targetParentId: string,
+											targetSiblingIndex: number,
+										) => {
+											submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
+										}}
+									/>
+								);
+							}
+							return (
+								<ChildrenBox
+									key={group.startSiblingIndex}
+									parent={map}
+									startSiblingIndex={group.startSiblingIndex}
+									nextStartSiblingIndex={group.nextStartSiblingIndex}
+									moveItem={(
+										movedItemId: string,
+										targetParentId: string,
+										targetSiblingIndex: number,
+									) => {
+										submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
+									}}
+								/>
+							);
+						})}
 						<AddItemButton
 							parent={map}
 							addItem={(addedChild: Item) => {
@@ -105,6 +127,26 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 					</main>
 				</ContextMenuTrigger>
 				<ContextMenuContent className="w-64">
+					<ContextMenuItem
+						onClick={() =>
+							submitJson({
+								...map,
+								children: map.children.map((child) => ({ ...child, isExpanded: false })),
+							})
+						}
+					>
+						Collapse All Children
+					</ContextMenuItem>
+					<ContextMenuItem
+						onClick={() =>
+							submitJson({
+								...map,
+								children: map.children.map((child) => ({ ...child, isExpanded: true })),
+							})
+						}
+					>
+						Expand All Children
+					</ContextMenuItem>
 					<ContextMenuItem onClick={() => copyItemToClipboard(map)}>
 						Copy as Markdown List
 					</ContextMenuItem>

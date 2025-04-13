@@ -6,15 +6,16 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
+import { HorizontalDropAcceptor, VerticalDropAcceptor } from "~/components/DragDrop";
 import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
-import { useAcceptCardInsert, useStartCardInsert } from "~/map/hooks/useCardInsert";
 import { type Item, itemSchema } from "~/map/models";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
 import { cn, inserterShape } from "~/utils/css";
 import { AddItemButton } from "./AddItemButton";
+import { ChildrenBox } from "./ChildrenBox";
 import { ItemCard } from "./Item";
-import styles from "./ItemFamily.module.css";
+import { groupChildren } from "./group-children";
 
 export function ItemFamily(props: {
 	parent: Item;
@@ -33,27 +34,6 @@ export function ItemFamily(props: {
 	const item = possiblyNewItem.success
 		? possiblyNewItem.data
 		: props.parent.children[props.siblingIndex];
-	const onDragStart = useStartCardInsert(item);
-	const { insertAt, onDragOver, onDragLeave, onDrop } = useAcceptCardInsert(
-		props.parent,
-		props.siblingIndex,
-		(params) => {
-			const { rect, clientX, clientY, insertAt } = params;
-			let midpoint: number;
-			const base = props.parent.isExpanded ? rect.left : rect.top;
-			const size = props.parent.isExpanded ? rect.width : rect.height;
-			const place = props.parent.isExpanded ? clientX : clientY;
-			if (insertAt === "before") {
-				midpoint = base + (size - 32) / 2 + 32;
-			} else if (insertAt === "after") {
-				midpoint = base + (size - 32) / 2;
-			} else {
-				midpoint = base + size / 2;
-			}
-			return place <= midpoint ? "before" : "after";
-		},
-		props.moveItem,
-	);
 
 	useKeyboardShortcut(["ctrl+e", "meta+e"], (e) => {
 		if (
@@ -64,88 +44,106 @@ export function ItemFamily(props: {
 		}
 	});
 
+	const DropAcceptor = item.isExpanded ? HorizontalDropAcceptor : VerticalDropAcceptor;
+
 	return (
 		<ContextMenu>
-			<div
-				className={cn(styles.layout, props.className)}
-				onDragOver={onDragOver}
-				onDragLeave={onDragLeave}
-				onDrop={onDrop}
-				id={item.id}
+			<DropAcceptor
+				parent={props.parent}
+				siblingIndex={props.siblingIndex}
+				moveItem={props.moveItem}
+				className={cn(props.className, "mx-1")}
+				disabledInsertAt={item.isExpanded ? ["into"] : []}
 			>
-				<ContextMenuTrigger className={styles.family}>
-					{!props.parent.isExpanded ? (
-						<ItemCard asParent={false} item={item} />
-					) : (
-						<div className={styles.familyLayout} draggable onDragStart={onDragStart}>
-							<div
-								className={cn(
-									styles.header,
-									"bg-card h-[120%] w-full flex rounded-t-lg border shadow-sm items-start relative",
-								)}
+				<ContextMenuTrigger>
+					<div className="grid">
+						<div
+							className={cn(
+								"w-full h-full flex rounded-lg border shadow-sm items-start relative bg-parent-card",
+								item.isExpanded && "h-[120%] rounded-b-none",
+							)}
+						>
+							<ItemCard
+								parent={props.parent}
+								siblingIndex={props.siblingIndex}
+								moveItem={props.moveItem}
+								className={cn("sticky left-0 border-none shadow-none")}
+								asParent={true}
+							/>
+							<TooltipButton
+								type="button"
+								variant="ghost"
+								size="icon"
+								className={cn("w-4 h-9 ml-auto sticky right-0")}
+								disabled={item.children.length === 0}
+								onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
+								tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
 							>
-								<ItemCard asParent item={item} className={cn(styles.self, "sticky left-0")} />
-								<TooltipButton
-									type="button"
-									variant="ghost"
-									size="icon"
-									className={cn(styles.expand, "w-4 h-20 ml-auto")}
-									disabled={item.children.length === 0}
-									onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
-									tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
-								>
-									{item.children.length === 0 ? null : item.isExpanded ? (
-										<ChevronLeftIcon />
-									) : (
-										<ChevronRightIcon />
-									)}
-								</TooltipButton>
-							</div>
-							<div
-								className={cn(
-									item.isExpanded ? styles.expandedLayout : styles.collapsedLayout,
-									styles.children,
-									"p-2 rounded-xl border-x border-t inset-shadow-xs bg-background z-10",
+								{item.children.length === 0 ? null : item.isExpanded ? (
+									<ChevronLeftIcon />
+								) : (
+									<ChevronRightIcon />
 								)}
-							>
-								{item.children.map((child, siblingIndex) => (
-									<ItemFamily
-										key={child.id}
-										parent={item}
-										siblingIndex={siblingIndex}
-										moveItem={props.moveItem}
-									/>
-								))}
-								<AddItemButton
-									parent={item}
-									addItem={(addedChild: Item) => {
-										submitJson({ ...item, children: [...item.children, addedChild] }, "PUT");
-									}}
-									moveItem={props.moveItem}
-								/>
-							</div>
+							</TooltipButton>
 						</div>
-					)}
+						{item.isExpanded ? (
+							<div
+								className={cn(
+									"flex py-1 rounded-xl border-x border-t inset-shadow-sm bg-background z-10",
+								)}
+							>
+								{groupChildren(item).map((group) => {
+									if (group.type === "parent") {
+										return (
+											<ItemFamily
+												key={group.startSiblingIndex}
+												parent={item}
+												siblingIndex={group.startSiblingIndex}
+												moveItem={props.moveItem}
+											/>
+										);
+									}
+									return (
+										<ChildrenBox
+											key={group.startSiblingIndex}
+											parent={item}
+											startSiblingIndex={group.startSiblingIndex}
+											nextStartSiblingIndex={group.nextStartSiblingIndex}
+											moveItem={props.moveItem}
+										/>
+									);
+								})}
+							</div>
+						) : null}
+					</div>
 				</ContextMenuTrigger>
-				<div
-					className={cn(
-						inserterShape(props.parent.isExpanded),
-						insertAt === "none"
-							? "hidden"
-							: props.parent.isExpanded
-								? insertAt === "before"
-									? styles.insertLeft
-									: styles.insertRight
-								: insertAt === "before"
-									? styles.insertTop
-									: styles.insertBottom,
-						"bg-secondary rounded-lg",
-					)}
-				/>
-			</div>
+			</DropAcceptor>
 			<ContextMenuContent className="w-64">
+				<ContextMenuItem
+					onClick={() =>
+						submitJson(
+							{
+								...item,
+								children: item.children.map((child) => ({ ...child, isExpanded: false })),
+							},
+							"PUT",
+						)
+					}
+				>
+					Collapse All Children
+				</ContextMenuItem>
+				<ContextMenuItem
+					onClick={() =>
+						submitJson(
+							{ ...item, children: item.children.map((child) => ({ ...child, isExpanded: true })) },
+							"PUT",
+						)
+					}
+				>
+					Expand All Children
+				</ContextMenuItem>
 				<ContextMenuItem onClick={() => copyItemToClipboard(item)}>
-					Copy as Markdown List
+					Copy Markdown List
 				</ContextMenuItem>
 				<ContextMenuItem
 					onClick={async () => {
