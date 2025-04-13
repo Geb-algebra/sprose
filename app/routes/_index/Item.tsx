@@ -8,12 +8,11 @@ import {
 } from "~/components/ContextMenu";
 import { createNewItem } from "~/map/lifecycle";
 import { type Item, itemSchema } from "~/map/models";
-import { copyItemToClipboard } from "~/map/services/clipboard.client";
-import { getChildFromClipboard } from "~/map/services/clipboard.client";
+import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
 import { BlurOnEnterTextArea } from "~/routes/_index/BlurOnEnterTextArea";
 import { VerticalDropAcceptor } from "~/routes/_index/DragDrop";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
-import { addingItemContext, mapContext } from "./context";
+import { addingItemContext } from "./context";
 
 export function ItemCard(props: {
 	parent: Item;

@@ -1,5 +1,4 @@
 import { TrashIcon } from "lucide-react";
-import { useContext } from "react";
 import { useFetcher } from "react-router";
 import { Button } from "~/components/Button";
 import {
@@ -14,7 +13,6 @@ import {
 import { TooltipButton } from "~/components/TooltipButton";
 import { createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { addingItemContext } from "../_index/context";
 
 export default function ClipboardPaste(props: { map: Item }) {
 	const fetcher = useFetcher();

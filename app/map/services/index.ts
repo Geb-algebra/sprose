@@ -1,5 +1,4 @@
 import type { Item } from "~/map/models";
-import { createNewItem } from "../lifecycle";
 
 export function updateItem(items: Item, newItem: { id: string } & Partial<Item>): Item {
 	if (items.id === newItem.id) {
