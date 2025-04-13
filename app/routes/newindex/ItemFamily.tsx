@@ -50,6 +50,7 @@ export function ItemFamily(props: {
 				parent={props.parent}
 				siblingIndex={props.siblingIndex}
 				moveItem={props.moveItem}
+				className={cn(props.className, "mx-1")}
 			>
 				<ContextMenuTrigger>
 					{!props.parent.isExpanded ? (
@@ -57,12 +58,13 @@ export function ItemFamily(props: {
 							parent={props.parent}
 							siblingIndex={props.siblingIndex}
 							moveItem={props.moveItem}
+							asParent={true}
 						/>
 					) : (
-						<div>
+						<div className="grid">
 							<div
 								className={cn(
-									"bg-card h-[120%] w-full flex rounded-t-lg border shadow-sm items-start relative",
+									"h-[120%] w-full flex rounded-t-lg border shadow-sm items-start relative bg-parent-card",
 								)}
 							>
 								<ItemCard
@@ -70,12 +72,13 @@ export function ItemFamily(props: {
 									siblingIndex={props.siblingIndex}
 									moveItem={props.moveItem}
 									className={cn("sticky left-0 border-none shadow-none")}
+									asParent={true}
 								/>
 								<TooltipButton
 									type="button"
 									variant="ghost"
 									size="icon"
-									className={cn("w-4 h-20 ml-auto")}
+									className={cn("w-4 h-9 ml-auto")}
 									disabled={item.children.length === 0}
 									onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
 									tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
@@ -89,11 +92,10 @@ export function ItemFamily(props: {
 							</div>
 							<div
 								className={cn(
-									"flex p-2 rounded-xl border-x border-t inset-shadow-xs bg-background z-10",
+									"flex py-2 rounded-xl border-x border-t inset-shadow-sm bg-background z-10",
 								)}
 							>
 								{groupChildren(item).map((group) => {
-									console.log(group);
 									if (group.type === "parent") {
 										return (
 											<ItemFamily
@@ -105,23 +107,13 @@ export function ItemFamily(props: {
 										);
 									}
 									return (
-										<ChildrenBox key={group.startSiblingIndex}>
-											{group.items.map((child, index) => (
-												<ItemCard
-													key={child.id}
-													parent={item}
-													siblingIndex={group.startSiblingIndex + index}
-													moveItem={props.moveItem}
-												/>
-											))}
-											<AddItemButton
-												parent={props.parent}
-												addItem={(addedChild: Item) => {
-													submitJson({ ...item, children: [...item.children, addedChild] }, "PUT");
-												}}
-												moveItem={() => {}}
-											/>
-										</ChildrenBox>
+										<ChildrenBox
+											key={group.startSiblingIndex}
+											parent={item}
+											startSiblingIndex={group.startSiblingIndex}
+											nextStartSiblingIndex={group.nextStartSiblingIndex}
+											moveItem={props.moveItem}
+										/>
 									);
 								})}
 							</div>

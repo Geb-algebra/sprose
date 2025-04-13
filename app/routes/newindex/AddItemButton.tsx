@@ -14,13 +14,12 @@ export function AddItemButton(props: {
 	const [writing, setWriting] = React.useState(false);
 	const addButton = React.useRef<HTMLButtonElement | null>(null);
 	return (
-		<div className={cn(props.className, "px-1")}>
+		<div className={cn(props.className, "px-2")}>
 			{writing ? (
 				<BlurOnEnterTextArea
 					className={cn(
 						"grid place-content-center bg-card p-2 text-sm resize-none",
 						cardShape,
-						"h-20",
 						focusVisibleStyle,
 					)}
 					onBlur={(e) => {
@@ -41,7 +40,6 @@ export function AddItemButton(props: {
 					className={cn(
 						"rounded-lg grid place-content-center bg-transparent transition-colors outline-none",
 						cardShape,
-						"h-20",
 						"border-2 border-border/50 border-dashed hover:border-ring focus-visible:border-ring",
 						"text-2xl text-border/50 hover:text-ring focus-visible:text-ring",
 					)}

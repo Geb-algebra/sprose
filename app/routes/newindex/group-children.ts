@@ -3,49 +3,65 @@ import type { Item } from "~/map/models";
 export type ItemGroup = {
 	type: "childless" | "parent";
 	startSiblingIndex: number;
-	items: Item[];
+	/** Index marking the start of the next group, or the total number of children if this is the last group. */
+	nextStartSiblingIndex: number;
 };
 
+/**
+ * Groups the children of an item into segments.
+ * Consecutive children without their own children are grouped into "childless" segments.
+ * Children that have their own children form individual "parent" segments.
+ *
+ * @param item The parent item whose children are to be grouped.
+ * @returns An array of ItemGroup objects representing the segments.
+ */
 export function groupChildren(item: Item): ItemGroup[] {
-	if (!item.children?.length) return [];
-
 	const result: ItemGroup[] = [];
-	let currentGroup: Item[] = [];
-	let currentGroupStartIndex = 0;
 
-	item.children.forEach((child, i) => {
-		const hasChildren = child.children?.length > 0;
-		const prevHasChildren = i > 0 && item.children[i - 1].children?.length > 0;
+	if (!item.children || item.children.length === 0) {
+		return result;
+	}
 
-		if (hasChildren) {
-			// If we've been building a group, add it to results first
-			if (currentGroup.length) {
+	let currentIndex = 0;
+	let childlessStartIndex = -1;
+
+	while (currentIndex < item.children.length) {
+		const child = item.children[currentIndex];
+
+		// If the current child has children, it forms a "parent" group
+		if (child.children && child.children.length > 0) {
+			// If we have started a childless segment, close it before adding a parent segment
+			if (childlessStartIndex !== -1) {
 				result.push({
 					type: "childless",
-					startSiblingIndex: currentGroupStartIndex,
-					items: [...currentGroup],
+					startSiblingIndex: childlessStartIndex,
+					nextStartSiblingIndex: currentIndex,
 				});
-				currentGroup = [];
+				childlessStartIndex = -1;
 			}
+
+			// Add the parent segment
 			result.push({
 				type: "parent",
-				startSiblingIndex: i,
-				items: [child],
+				startSiblingIndex: currentIndex,
+				nextStartSiblingIndex: currentIndex + 1,
 			});
-		} else if (prevHasChildren) {
-			currentGroup = [child];
-			currentGroupStartIndex = i;
 		} else {
-			currentGroup.push(child);
+			// If this is the first childless item in a potential sequence, mark its position
+			if (childlessStartIndex === -1) {
+				childlessStartIndex = currentIndex;
+			}
 		}
-	});
 
-	// Add any remaining items in the current group
-	if (currentGroup.length) {
+		currentIndex++;
+	}
+
+	// If we have an open childless segment at the end, close it
+	if (childlessStartIndex !== -1) {
 		result.push({
 			type: "childless",
-			startSiblingIndex: currentGroupStartIndex,
-			items: currentGroup,
+			startSiblingIndex: childlessStartIndex,
+			nextStartSiblingIndex: item.children.length,
 		});
 	}
 

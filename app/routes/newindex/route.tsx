@@ -93,32 +93,19 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 								);
 							}
 							return (
-								<ChildrenBox key={group.startSiblingIndex}>
-									{group.items.map((item, index) => (
-										<ItemCard
-											key={item.id}
-											parent={map}
-											siblingIndex={group.startSiblingIndex + index}
-											moveItem={(
-												movedItemId: string,
-												targetParentId: string,
-												targetSiblingIndex: number,
-											) => {
-												submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
-											}}
-										/>
-									))}
-									<AddItemButton
-										parent={map}
-										addItem={(addedChild: Item) => {
-											submitJson({
-												...map,
-												children: [...map.children, addedChild],
-											});
-										}}
-										moveItem={() => {}}
-									/>
-								</ChildrenBox>
+								<ChildrenBox
+									key={group.startSiblingIndex}
+									parent={map}
+									startSiblingIndex={group.startSiblingIndex}
+									nextStartSiblingIndex={group.nextStartSiblingIndex}
+									moveItem={(
+										movedItemId: string,
+										targetParentId: string,
+										targetSiblingIndex: number,
+									) => {
+										submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
+									}}
+								/>
 							);
 						})}
 						{map.children.length === 0 && (
