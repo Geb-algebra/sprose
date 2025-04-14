@@ -1,7 +1,10 @@
 import { createContext, useState } from "react";
 import type { Item } from "~/map/models";
 
-export const mapContext = createContext<Item | null>(null);
+export const mapContext = createContext<{
+	map: Item | null;
+	submitMap: (map: Item) => void;
+}>({ map: null, submitMap: () => {} });
 
 export const addingItemContext = createContext<{
 	addingItemId: string | null;

@@ -8,6 +8,7 @@ import { cn } from "~/utils/css";
 
 const cardType = "application/item-card";
 type InsertAt = "none" | "before" | "after" | "into";
+type Axis = "horizontal" | "vertical";
 
 export function Dragger(props: {
 	item: Item;
@@ -29,23 +30,19 @@ export function Dragger(props: {
 	);
 }
 
-export function HorizontalDropAcceptor(props: {
+// New generic DropAcceptor component
+function DropAcceptor(props: {
 	parent: Item;
 	siblingIndex: number;
 	children: React.ReactNode;
 	disabledInsertAt: InsertAt[];
+	axis: Axis;
 	className?: string;
 }) {
-	const map = useContext(mapContext);
+	const { map, submitMap } = useContext(mapContext);
 	const { setAddingItemId } = useContext(addingItemContext);
-	const fetcher = useFetcher();
-	function submitJson(map: Item) {
-		fetcher.submit(map, {
-			method: "PUT",
-			encType: "application/json",
-		});
-	}
 	const item = props.parent.children[props.siblingIndex];
+
 	const moveOrAddItem = (
 		movedItemId: string,
 		targetParentId: string,
@@ -57,59 +54,108 @@ export function HorizontalDropAcceptor(props: {
 		if (!findChildById(map, movedItemId)) {
 			// add a new Item
 			setAddingItemId(movedItemId);
-			submitJson(
+			submitMap(
 				addNewItem(targetParentId, map, createNewItem("", movedItemId), targetSiblingIndex),
 			);
 		} else {
-			submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
+			submitMap(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
 		}
 	};
+
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
+
+	const handleDragOver = (e: React.DragEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const rect = e.currentTarget.getBoundingClientRect();
+		let newInsertAt: InsertAt = "none";
+
+		if (props.axis === "horizontal") {
+			const buffer = 48; // Horizontal buffer
+			if (!props.disabledInsertAt.includes("before") && e.clientX < rect.left + buffer) {
+				newInsertAt = "before";
+			} else if (!props.disabledInsertAt.includes("after") && e.clientX > rect.right - buffer) {
+				newInsertAt = "after";
+			} else if (!props.disabledInsertAt.includes("into")) {
+				newInsertAt = "into";
+			}
+		} else {
+			// Vertical
+			const buffer = 16; // Vertical buffer
+			if (!props.disabledInsertAt.includes("before") && e.clientY < rect.top + buffer) {
+				newInsertAt = "before";
+			} else if (!props.disabledInsertAt.includes("after") && e.clientY > rect.bottom - buffer) {
+				newInsertAt = "after";
+			} else if (!props.disabledInsertAt.includes("into")) {
+				newInsertAt = "into";
+			}
+		}
+		setInsertAt(newInsertAt);
+	};
+
+	const handleDrop = (e: React.DragEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		try {
+			const movedItem = itemSchema.parse(JSON.parse(e.dataTransfer.getData(cardType)));
+			if (insertAt === "into") {
+				moveOrAddItem(movedItem.id, item.id, item.children.length);
+			} else {
+				moveOrAddItem(
+					movedItem.id,
+					props.parent.id,
+					insertAt === "before" ? props.siblingIndex : props.siblingIndex + 1,
+				);
+			}
+		} catch (error) {
+			console.error("Failed to parse dropped item data:", error);
+			// Handle potential parsing error, e.g., show a notification
+		} finally {
+			setInsertAt("none");
+		}
+	};
+
+	const handleDragLeave = () => {
+		setInsertAt("none");
+	};
+
+	const borderClasses = {
+		horizontal: {
+			before: "border-l-2 border-l-primary",
+			after: "border-r-2 border-r-primary",
+		},
+		vertical: {
+			before: "border-t-2 border-t-primary",
+			after: "border-b-2 border-b-primary",
+		},
+	};
+
 	return (
 		<div
 			className={cn(
 				"p-1",
 				props.className,
-				insertAt === "before" && "border-l-2 border-l-primary",
-				insertAt === "after" && "border-r-2 border-r-primary",
+				insertAt === "before" && borderClasses[props.axis].before,
+				insertAt === "after" && borderClasses[props.axis].after,
 				insertAt === "into" && "rounded-lg border-2 border-dashed border-primary",
 			)}
-			onDragOver={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const rect = e.currentTarget.getBoundingClientRect();
-				if (!props.disabledInsertAt.includes("before") && e.clientX < rect.left + 48) {
-					setInsertAt("before");
-				} else if (!props.disabledInsertAt.includes("after") && e.clientX > rect.right - 48) {
-					setInsertAt("after");
-				} else if (!props.disabledInsertAt.includes("into")) {
-					setInsertAt("into");
-				} else {
-					setInsertAt("none");
-				}
-			}}
-			onDragLeave={() => setInsertAt("none")}
-			onDrop={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const movedItem = itemSchema.parse(
-					JSON.parse(e.dataTransfer.getData("application/item-card")),
-				);
-				if (insertAt === "into") {
-					moveOrAddItem(movedItem.id, item.id, item.children.length);
-				} else {
-					moveOrAddItem(
-						movedItem.id,
-						props.parent.id,
-						insertAt === "before" ? props.siblingIndex : props.siblingIndex + 1,
-					);
-				}
-				setInsertAt("none");
-			}}
+			onDragOver={handleDragOver}
+			onDragLeave={handleDragLeave}
+			onDrop={handleDrop}
 		>
 			<Dragger item={item}>{props.children}</Dragger>
 		</div>
 	);
+}
+
+export function HorizontalDropAcceptor(props: {
+	parent: Item;
+	siblingIndex: number;
+	children: React.ReactNode;
+	disabledInsertAt: InsertAt[];
+	className?: string;
+}) {
+	return <DropAcceptor {...props} axis="horizontal" />;
 }
 
 export function VerticalDropAcceptor(props: {
@@ -119,79 +165,5 @@ export function VerticalDropAcceptor(props: {
 	disabledInsertAt: InsertAt[];
 	className?: string;
 }) {
-	const map = useContext(mapContext);
-	const { setAddingItemId } = useContext(addingItemContext);
-	const fetcher = useFetcher();
-	function submitJson(map: Item) {
-		fetcher.submit(map, {
-			method: "PUT",
-			encType: "application/json",
-		});
-	}
-	const item = props.parent.children[props.siblingIndex];
-	const moveOrAddItem = (
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) => {
-		if (!map) {
-			throw new Error("Map not found");
-		}
-		if (!findChildById(map, movedItemId)) {
-			// add a new Item
-			setAddingItemId(movedItemId);
-			submitJson(
-				addNewItem(targetParentId, map, createNewItem("", movedItemId), targetSiblingIndex),
-			);
-		} else {
-			submitJson(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
-		}
-	};
-	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
-	return (
-		<div
-			className={cn(
-				"p-1",
-				props.className,
-				insertAt === "before" && "border-t-2 border-t-primary",
-				insertAt === "after" && "border-b-2 border-b-primary",
-				insertAt === "into" && "rounded-lg border-2 border-dashed border-primary",
-			)}
-			onDragOver={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const rect = e.currentTarget.getBoundingClientRect();
-				if (!props.disabledInsertAt.includes("before") && e.clientY < rect.top + 16) {
-					setInsertAt("before");
-				} else if (!props.disabledInsertAt.includes("after") && e.clientY > rect.bottom - 16) {
-					setInsertAt("after");
-				} else if (!props.disabledInsertAt.includes("into")) {
-					setInsertAt("into");
-				} else {
-					setInsertAt("none");
-				}
-			}}
-			onDragLeave={() => setInsertAt("none")}
-			onDrop={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-
-				const movedItem = itemSchema.parse(
-					JSON.parse(e.dataTransfer.getData("application/item-card")),
-				);
-				if (insertAt === "into") {
-					moveOrAddItem(movedItem.id, item.id, item.children.length);
-				} else {
-					moveOrAddItem(
-						movedItem.id,
-						props.parent.id,
-						insertAt === "before" ? props.siblingIndex : props.siblingIndex + 1,
-					);
-				}
-				setInsertAt("none");
-			}}
-		>
-			<Dragger item={item}>{props.children}</Dragger>
-		</div>
-	);
+	return <DropAcceptor {...props} axis="vertical" />;
 }

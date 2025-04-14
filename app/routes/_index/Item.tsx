@@ -30,7 +30,9 @@ export function ItemCard(props: {
 	}
 	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
 	const item = possiblyNewItem.success
-		? possiblyNewItem.data
+		? possiblyNewItem.data.id === props.parent.id
+			? possiblyNewItem.data.children[props.siblingIndex]
+			: possiblyNewItem.data
 		: props.parent.children[props.siblingIndex];
 	const [editing, setEditing] = React.useState(addingItemId === item.id);
 

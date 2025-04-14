@@ -23,6 +23,7 @@ import { AddingItemProvider, addingItemContext, mapContext } from "./context";
 import { groupChildren } from "./group-children";
 
 export async function clientLoader() {
+	await new Promise((resolve) => setTimeout(resolve, 1000));
 	return await MapRepository.get();
 }
 
@@ -40,7 +41,6 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	} else {
 		throw new Error("Invalid method");
 	}
-	console.log("saving", newMap);
 	await MapRepository.save(newMap);
 	return null;
 }
@@ -50,8 +50,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 	const { setAddingItemId } = useContext(addingItemContext);
 	const possiblyNewMap = itemSchema.safeParse(fetcher.json);
 	const map = possiblyNewMap.success ? possiblyNewMap.data : loaderData;
-	console.log(map);
-	function submitJson(map: Item) {
+	function submitMap(map: Item) {
 		fetcher.submit(map, {
 			method: "PUT",
 			encType: "application/json",
@@ -59,7 +58,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 	}
 
 	return (
-		<mapContext.Provider value={map}>
+		<mapContext.Provider value={{ map, submitMap }}>
 			<AddingItemProvider>
 				<ContextMenu>
 					<div className={cn(styles.bodyLayout, "bg-secondary")}>
@@ -106,7 +105,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 						<ContextMenuContent className="w-64">
 							<ContextMenuItem
 								onClick={() =>
-									submitJson({
+									submitMap({
 										...map,
 										children: map.children.map((child) => ({ ...child, isExpanded: false })),
 									})
@@ -116,7 +115,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 							</ContextMenuItem>
 							<ContextMenuItem
 								onClick={() =>
-									submitJson({
+									submitMap({
 										...map,
 										children: map.children.map((child) => ({ ...child, isExpanded: true })),
 									})
@@ -131,7 +130,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 								onClick={async () => {
 									const newChildren = await getChildFromClipboard();
 									if (newChildren) {
-										submitJson({
+										submitMap({
 											...map,
 											children: [...map.children, ...newChildren],
 										});
@@ -144,7 +143,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 								className="text-destructive focus:bg-destructive-foreground"
 								onClick={() => {
 									const newItem = createNewItem("");
-									submitJson({ ...map, children: [newItem] });
+									submitMap({ ...map, children: [newItem] });
 									setAddingItemId(newItem.id);
 								}}
 							>
