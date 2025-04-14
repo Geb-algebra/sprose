@@ -18,7 +18,6 @@ import { Control } from "~/routes/control/route";
 import type { Route } from "./+types/route";
 import { ChildrenBox } from "./ChildrenBox";
 import { ItemFamily } from "./ItemFamily";
-import { NewCardDeck } from "./NewCardDeck";
 import { AddingItemProvider, addingItemContext, mapContext } from "./context";
 import { groupChildren } from "./group-children";
 
@@ -72,7 +71,6 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 							Sprose
 						</h1>
 						<Control map={map} className={styles.control} />
-						<NewCardDeck className={styles.deck} />
 						<ContextMenuTrigger asChild>
 							<main
 								className={cn(
