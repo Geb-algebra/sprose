@@ -6,13 +6,12 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import { createNewItem } from "~/map/lifecycle";
-import { type Item, itemSchema } from "~/map/models";
+import type { Item } from "~/map/models";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
 import { BlurOnEnterTextArea } from "~/routes/_index/BlurOnEnterTextArea";
 import { VerticalDropAcceptor } from "~/routes/_index/DragDrop";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
-import { addingItemContext } from "./context";
+import { mapControllerContext } from "./context";
 
 export function ItemCard(props: {
 	parent: Item;
@@ -20,20 +19,9 @@ export function ItemCard(props: {
 	className?: string;
 	asParent?: boolean;
 }) {
-	const fetcher = useFetcher();
-	const { addingItemId, setAddingItemId } = useContext(addingItemContext);
-	async function submitJson(map: Item, method: "PUT" | "DELETE") {
-		await fetcher.submit(map, {
-			method,
-			encType: "application/json",
-		});
-	}
-	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
-	const item = possiblyNewItem.success
-		? possiblyNewItem.data.id === props.parent.id
-			? possiblyNewItem.data.children[props.siblingIndex]
-			: possiblyNewItem.data
-		: props.parent.children[props.siblingIndex];
+	const { updateItemText, removeItem, updateChildren, addingItemId } =
+		useContext(mapControllerContext);
+	const item = props.parent.children[props.siblingIndex];
 	const [editing, setEditing] = React.useState(addingItemId === item.id);
 
 	const content = editing ? (
@@ -46,41 +34,7 @@ export function ItemCard(props: {
 			)}
 			defaultValue={item.description}
 			onBlur={(e) => {
-				if (e.target.value.trim() !== "") {
-					let newChildren: Item[];
-					if (addingItemId === item.id) {
-						const newItem = createNewItem("");
-						newChildren = [
-							...props.parent.children.slice(0, props.siblingIndex),
-							{
-								...item,
-								description: e.target.value,
-							},
-							newItem,
-							...props.parent.children.slice(props.siblingIndex + 1),
-						];
-						setAddingItemId(newItem.id);
-					} else {
-						newChildren = [
-							...props.parent.children.slice(0, props.siblingIndex),
-							{
-								...item,
-								description: e.target.value,
-							},
-							...props.parent.children.slice(props.siblingIndex + 1),
-						];
-					}
-					submitJson(
-						{
-							...props.parent,
-							children: newChildren,
-						},
-						"PUT",
-					);
-				} else {
-					submitJson(item, "DELETE");
-					setAddingItemId(null);
-				}
+				updateItemText(item, e.target.value);
 				setEditing(false);
 			}}
 		/>
@@ -98,7 +52,7 @@ export function ItemCard(props: {
 			onKeyDown={(e) => {
 				if (e.key === "Backspace") {
 					e.preventDefault();
-					submitJson(item, "DELETE");
+					removeItem(item);
 				}
 			}}
 		>
@@ -128,7 +82,7 @@ export function ItemCard(props: {
 					onClick={async () => {
 						const newChildren = await getChildFromClipboard();
 						if (newChildren) {
-							submitJson({ ...item, children: [...item.children, ...newChildren] }, "PUT");
+							updateChildren(item, newChildren);
 						}
 					}}
 				>
@@ -136,7 +90,7 @@ export function ItemCard(props: {
 				</ContextMenuItem>
 				<ContextMenuItem
 					className="text-destructive focus:bg-destructive-foreground"
-					onClick={() => submitJson(item, "DELETE")}
+					onClick={() => removeItem(item)}
 				>
 					Delete
 				</ContextMenuItem>

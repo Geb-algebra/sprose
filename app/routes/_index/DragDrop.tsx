@@ -1,9 +1,6 @@
 import React, { useContext } from "react";
-import { useFetcher } from "react-router";
-import { createNewItem } from "~/map/lifecycle";
 import { type Item, itemSchema } from "~/map/models";
-import { addNewItem, findChildById, moveItem } from "~/map/services";
-import { addingItemContext, mapContext } from "~/routes/_index/context";
+import { mapControllerContext } from "~/routes/_index/context";
 import { cn } from "~/utils/css";
 
 const cardType = "application/item-card";
@@ -39,28 +36,8 @@ function DropAcceptor(props: {
 	axis: Axis;
 	className?: string;
 }) {
-	const { map, submitMap } = useContext(mapContext);
-	const { setAddingItemId } = useContext(addingItemContext);
+	const { moveOrAddItem } = useContext(mapControllerContext);
 	const item = props.parent.children[props.siblingIndex];
-
-	const moveOrAddItem = (
-		movedItemId: string,
-		targetParentId: string,
-		targetSiblingIndex: number,
-	) => {
-		if (!map) {
-			throw new Error("Map not found");
-		}
-		if (!findChildById(map, movedItemId)) {
-			// add a new Item
-			setAddingItemId(movedItemId);
-			submitMap(
-				addNewItem(targetParentId, map, createNewItem("", movedItemId), targetSiblingIndex),
-			);
-		} else {
-			submitMap(moveItem(movedItemId, targetParentId, targetSiblingIndex, map));
-		}
-	};
 
 	const [insertAt, setInsertAt] = React.useState<InsertAt>("none");
 
