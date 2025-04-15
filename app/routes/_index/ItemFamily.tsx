@@ -1,46 +1,36 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useFetcher } from "react-router";
+import { useContext } from "react";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import { HorizontalDropAcceptor, VerticalDropAcceptor } from "~/components/DragDrop";
 import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
-import { type Item, itemSchema } from "~/map/models";
+import type { Item } from "~/map/models";
 import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
-import { cn, inserterShape } from "~/utils/css";
-import { AddItemButton } from "./AddItemButton";
+import { HorizontalDropAcceptor, VerticalDropAcceptor } from "~/routes/_index/DragDrop";
+import { cn } from "~/utils/css";
 import { ChildrenBox } from "./ChildrenBox";
 import { ItemCard } from "./Item";
+import { mapControllerContext } from "./context";
 import { groupChildren } from "./group-children";
 
 export function ItemFamily(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
-	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void;
 }) {
-	const fetcher = useFetcher();
-	function submitJson(newItem: Item, method: "PUT" | "DELETE") {
-		fetcher.submit(newItem, {
-			method,
-			encType: "application/json",
-		});
-	}
-	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
-	const item = possiblyNewItem.success
-		? possiblyNewItem.data
-		: props.parent.children[props.siblingIndex];
+	const item = props.parent.children[props.siblingIndex];
+	const { toggleExpand, updateChildren, removeItem } = useContext(mapControllerContext);
 
 	useKeyboardShortcut(["ctrl+e", "meta+e"], (e) => {
 		if (
 			document.activeElement &&
 			document.getElementById(item.id)?.contains(document.activeElement)
 		) {
-			submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT");
+			toggleExpand(item);
 		}
 	});
 
@@ -51,7 +41,6 @@ export function ItemFamily(props: {
 			<DropAcceptor
 				parent={props.parent}
 				siblingIndex={props.siblingIndex}
-				moveItem={props.moveItem}
 				className={cn(props.className, "mx-1")}
 				disabledInsertAt={item.isExpanded ? ["into"] : []}
 			>
@@ -60,13 +49,12 @@ export function ItemFamily(props: {
 						<div
 							className={cn(
 								"w-full h-full flex rounded-lg border shadow-sm items-start relative bg-parent-card",
-								item.isExpanded && "h-[120%] rounded-b-none",
+								item.isExpanded && "h-[150%] rounded-b-none",
 							)}
 						>
 							<ItemCard
 								parent={props.parent}
 								siblingIndex={props.siblingIndex}
-								moveItem={props.moveItem}
 								className={cn("sticky left-0 border-none shadow-none")}
 								asParent={true}
 							/>
@@ -76,7 +64,7 @@ export function ItemFamily(props: {
 								size="icon"
 								className={cn("w-4 h-9 ml-auto sticky right-0")}
 								disabled={item.children.length === 0}
-								onClick={() => submitJson({ ...item, isExpanded: !item.isExpanded }, "PUT")}
+								onClick={() => toggleExpand(item)}
 								tooltip={`${item.isExpanded ? "Collapse" : "Expand"} (${typeof window !== "undefined" && window.navigator.userAgent.includes("Mac") ? "⌘E" : "Ctrl+E"} when focused)`}
 							>
 								{item.children.length === 0 ? null : item.isExpanded ? (
@@ -99,7 +87,6 @@ export function ItemFamily(props: {
 												key={group.startSiblingIndex}
 												parent={item}
 												siblingIndex={group.startSiblingIndex}
-												moveItem={props.moveItem}
 											/>
 										);
 									}
@@ -109,7 +96,6 @@ export function ItemFamily(props: {
 											parent={item}
 											startSiblingIndex={group.startSiblingIndex}
 											nextStartSiblingIndex={group.nextStartSiblingIndex}
-											moveItem={props.moveItem}
 										/>
 									);
 								})}
@@ -120,25 +106,18 @@ export function ItemFamily(props: {
 			</DropAcceptor>
 			<ContextMenuContent className="w-64">
 				<ContextMenuItem
-					onClick={() =>
-						submitJson(
-							{
-								...item,
-								children: item.children.map((child) => ({ ...child, isExpanded: false })),
-							},
-							"PUT",
-						)
-					}
+					onClick={() => {
+						const newChildren = item.children.map((child) => ({ ...child, isExpanded: false }));
+						updateChildren(item, newChildren);
+					}}
 				>
 					Collapse All Children
 				</ContextMenuItem>
 				<ContextMenuItem
-					onClick={() =>
-						submitJson(
-							{ ...item, children: item.children.map((child) => ({ ...child, isExpanded: true })) },
-							"PUT",
-						)
-					}
+					onClick={() => {
+						const newChildren = item.children.map((child) => ({ ...child, isExpanded: true }));
+						updateChildren(item, newChildren);
+					}}
 				>
 					Expand All Children
 				</ContextMenuItem>
@@ -149,7 +128,7 @@ export function ItemFamily(props: {
 					onClick={async () => {
 						const newChildren = await getChildFromClipboard();
 						if (newChildren) {
-							submitJson({ ...item, children: [...item.children, ...newChildren] }, "PUT");
+							updateChildren(item, [...item.children, ...newChildren]);
 						}
 					}}
 				>
@@ -157,7 +136,7 @@ export function ItemFamily(props: {
 				</ContextMenuItem>
 				<ContextMenuItem
 					className="text-destructive focus:bg-destructive-foreground"
-					onClick={() => submitJson(item, "DELETE")}
+					onClick={() => removeItem(item)}
 				>
 					Delete
 				</ContextMenuItem>

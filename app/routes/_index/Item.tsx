@@ -1,37 +1,28 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useFetcher } from "react-router";
-import { BlurOnEnterTextArea } from "~/components/BlurOnEnterTextArea";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "~/components/ContextMenu";
-import { VerticalDropAcceptor } from "~/components/DragDrop";
-import { type Item, itemSchema } from "~/map/models";
-import { copyItemToClipboard } from "~/map/services/clipboard.client";
-import { getChildFromClipboard } from "~/map/services/clipboard.client";
+import type { Item } from "~/map/models";
+import { copyItemToClipboard, getChildFromClipboard } from "~/map/services/clipboard.client";
+import { BlurOnEnterTextArea } from "~/routes/_index/BlurOnEnterTextArea";
+import { VerticalDropAcceptor } from "~/routes/_index/DragDrop";
 import { cardShape, cn, focusVisibleStyle } from "~/utils/css";
+import { mapControllerContext } from "./context";
 
 export function ItemCard(props: {
 	parent: Item;
 	siblingIndex: number;
 	className?: string;
-	moveItem: (movedItemId: string, targetParentId: string, targetSiblingIndex: number) => void;
 	asParent?: boolean;
 }) {
-	const fetcher = useFetcher();
-	function submitJson(map: Item, method: "PUT" | "DELETE") {
-		fetcher.submit(map, {
-			method,
-			encType: "application/json",
-		});
-	}
-	const possiblyNewItem = itemSchema.safeParse(fetcher.json);
-	const item = possiblyNewItem.success
-		? possiblyNewItem.data
-		: props.parent.children[props.siblingIndex];
-	const [editing, setEditing] = React.useState(false);
+	const { updateItemText, removeItem, updateChildren, addingItemId } =
+		useContext(mapControllerContext);
+	const item = props.parent.children[props.siblingIndex];
+	const [editing, setEditing] = React.useState(addingItemId === item.id);
 
 	const content = editing ? (
 		<BlurOnEnterTextArea
@@ -43,11 +34,7 @@ export function ItemCard(props: {
 			)}
 			defaultValue={item.description}
 			onBlur={(e) => {
-				if (e.target.value.trim() !== "") {
-					submitJson({ ...item, description: e.target.value }, "PUT");
-				} else {
-					submitJson(item, "DELETE");
-				}
+				updateItemText(item, e.target.value);
 				setEditing(false);
 			}}
 		/>
@@ -65,7 +52,7 @@ export function ItemCard(props: {
 			onKeyDown={(e) => {
 				if (e.key === "Backspace") {
 					e.preventDefault();
-					submitJson(item, "DELETE");
+					removeItem(item);
 				}
 			}}
 		>
@@ -82,7 +69,6 @@ export function ItemCard(props: {
 			<VerticalDropAcceptor
 				parent={props.parent}
 				siblingIndex={props.siblingIndex}
-				moveItem={props.moveItem}
 				disabledInsertAt={[]}
 				className={cn(props.className, "mx-1")}
 			>
@@ -96,7 +82,7 @@ export function ItemCard(props: {
 					onClick={async () => {
 						const newChildren = await getChildFromClipboard();
 						if (newChildren) {
-							submitJson({ ...item, children: [...item.children, ...newChildren] }, "PUT");
+							updateChildren(item, newChildren);
 						}
 					}}
 				>
@@ -104,7 +90,7 @@ export function ItemCard(props: {
 				</ContextMenuItem>
 				<ContextMenuItem
 					className="text-destructive focus:bg-destructive-foreground"
-					onClick={() => submitJson(item, "DELETE")}
+					onClick={() => removeItem(item)}
 				>
 					Delete
 				</ContextMenuItem>
