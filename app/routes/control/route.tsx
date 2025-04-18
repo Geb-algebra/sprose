@@ -73,7 +73,7 @@ export function Control(props: { map: Item; className?: string }) {
 				<div
 					className={cn(
 						cardShape,
-						"bg-card border rounded-lg shadow-sm text-muted-foreground/50 text-sm p-2",
+						"bg-card border rounded-lg shadow-sm text-muted-foreground/50 text-sm h-9 p-2",
 					)}
 				>
 					Drag/Drop this to add a new card

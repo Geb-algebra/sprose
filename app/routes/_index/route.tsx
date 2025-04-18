@@ -21,7 +21,6 @@ import { MapControllerProvider } from "./context";
 import { groupChildren } from "./group-children";
 
 export async function clientLoader() {
-	await new Promise((resolve) => setTimeout(resolve, 1000));
 	return await MapRepository.get();
 }
 
