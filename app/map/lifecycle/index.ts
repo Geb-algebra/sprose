@@ -6,7 +6,7 @@ export function createEmptyMap(): Item {
 		id: "__root",
 		description: "",
 		isExpanded: true,
-		children: [],
+		children: [createNewItem("")],
 	};
 }
 

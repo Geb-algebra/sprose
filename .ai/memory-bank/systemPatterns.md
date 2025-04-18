@@ -97,10 +97,15 @@ While not explicitly named as such, the application uses a command-like pattern 
 
 The UI follows a component-based architecture with clear responsibilities:
 
-- **Page**: The main container that renders the overall layout
-- **ItemFamily**: Renders an item and its children, handling expansion/collapse
-- **ItemCard**: Renders an individual item, handling editing
-- **AddItemButton**: Button for adding new items at specific positions
+- **Page**: The main container that renders the overall layout.
+- **ItemFamily**: Renders an item and its children. Handles expansion/collapse and context menus.
+    - When collapsed, renders only the item card vertically.
+    - When expanded, renders the item card on the left and arranges child groups horizontally.
+    - Uses `groupChildren` utility to group consecutive non-parent children.
+    - Renders child groups using either `ItemFamily` (for children with their own children) or `ChildrenBox`.
+- **ItemCard**: Renders an individual item, handling editing and context menus. Includes logic for seamless sequential card addition.
+- **ChildrenBox**: Renders a vertical grid of non-parent child items within an expanded `ItemFamily`.
+- **AddItemButton**: _(This component seems to have been removed or its functionality integrated elsewhere, likely into `ItemCard`'s editing logic based on `addingItemId` context)_.
 
 ## State Management
 
@@ -116,7 +121,10 @@ Custom drag and drop functionality is implemented using:
 
 - Native HTML5 drag and drop API
 - Custom hooks (`useStartCardInsert`, `useAcceptCardInsert`)
-- Visual indicators for drop targets
+- Different drop acceptors based on expansion state:
+    - `VerticalDropAcceptor` when collapsed.
+    - `HorizontalDropAcceptor` when expanded (accepts drops between horizontally arranged child groups).
+- Visual indicators for drop targets.
 
 ## Clipboard Integration
 

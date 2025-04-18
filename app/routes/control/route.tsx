@@ -1,10 +1,12 @@
 import { RedoIcon, UndoIcon } from "lucide-react";
 import { useFetcher } from "react-router";
+import { Separator } from "~/components/Separator";
 import { TooltipButton } from "~/components/TooltipButton";
 import { useKeyboardShortcut } from "~/hooks/useKeyboardShortcut";
-import { MapRepository } from "~/map/lifecycle";
+import { MapRepository, createNewItem } from "~/map/lifecycle";
 import type { Item } from "~/map/models";
-import { cn } from "~/utils/css";
+import { cardShape, cn } from "~/utils/css";
+import { Dragger } from "../_index/DragDrop";
 import type { Route } from "./+types/route";
 import ClipboardCopy from "./ClipboardCopy";
 import ClipboardPaste from "./ClipboardPaste";
@@ -40,7 +42,7 @@ export function Control(props: { map: Item; className?: string }) {
 	);
 
 	return (
-		<div className={cn(props.className, "flex bg-card shadow-sm rounded-lg w-fit p-1")}>
+		<div className={cn(props.className, "flex bg-background shadow-sm rounded-xl w-fit p-2")}>
 			<fetcher.Form action="/control" method="post" className="flex w-fit">
 				<TooltipButton
 					type="submit"
@@ -66,6 +68,17 @@ export function Control(props: { map: Item; className?: string }) {
 			<ClipboardCopy map={props.map} />
 			<ClipboardPaste map={props.map} />
 			<Delete map={props.map} />
+			<Separator orientation="vertical" className="mx-2" />
+			<Dragger item={createNewItem("")}>
+				<div
+					className={cn(
+						cardShape,
+						"bg-card border rounded-lg shadow-sm text-muted-foreground/50 text-sm h-9 p-2",
+					)}
+				>
+					Drag/Drop this to add a new card
+				</div>
+			</Dragger>
 		</div>
 	);
 }

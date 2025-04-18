@@ -3,12 +3,12 @@
 	height: 100vh;
 	padding: 8px;
 	display: grid;
-	grid-template-columns: 1fr 160px 1fr;
+	grid-template-columns: 1fr auto auto 1fr;
 	grid-template-rows: auto 1fr;
 	gap: 8px;
 	grid-template-areas:
-		"title control ."
-		"main main main";
+		"title control deck ."
+		"main main main main";
 }
 
 .title {
@@ -25,6 +25,10 @@
 
 .control {
 	grid-area: control;
+}
+
+.deck {
+	grid-area: deck;
 }
 
 .main {

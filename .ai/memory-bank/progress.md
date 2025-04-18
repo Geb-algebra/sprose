@@ -177,13 +177,16 @@ The project has successfully implemented all core functionality for hierarchical
 5. Local storage for data persistence with automatic saving
 6. Multi-line text support in items
 7. Keyboard shortcuts for common actions
+8. Redesigned card addition flow for seamless creation of multiple cards
+9. Significant layout improvements for better card arrangement
 
 ## Current Development Focus
 
-The current development focus is on stabilizing the existing features and preparing for the next phase of development, which will likely include:
+The current development focus is on stabilizing the newly implemented features and preparing for the next phase, which includes:
 
-1. Enhanced export/import capabilities with direct file support
-2. Performance optimizations for large trees
-3. Search and filtering functionality
-4. Support for multiple maps/documents
-5. Improved mobile support
+1. Refining the redesigned card addition flow and layout
+2. Enhanced export/import capabilities with direct file support
+3. Performance optimizations for large trees
+4. Search and filtering functionality
+5. Support for multiple maps/documents
+6. Improved mobile support

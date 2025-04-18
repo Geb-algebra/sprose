@@ -84,24 +84,26 @@ The project implements several recursive tree operations:
 
 ### Component Hierarchy
 
-- **Page**: Top-level container for the entire application
-  - Renders the overall layout and handles top-level state
-  - Provides context menu for root-level operations
+- **Page**: Top-level container for the entire application.
+- **ItemFamily**: Container for an item and its children. Handles expansion/collapse and context menus.
+    - When collapsed, renders only the item card vertically.
+    - When expanded, renders the item card on the left and arranges child groups horizontally using `flex`.
+    - Uses `groupChildren` utility to group consecutive non-parent children.
+    - Renders child groups using either `ItemFamily` (for children with their own children) or `ChildrenBox`.
+- **ItemCard**: Individual item display and editing. Handles context menus and the seamless sequential card addition logic using `addingItemId` context.
+- **ChildrenBox**: Renders a vertical grid of non-parent child items within an expanded `ItemFamily`.
+- **AddItemButton**: _(Removed/integrated into `ItemCard` editing flow)_. 
 
-- **ItemFamily**: Container for an item and its children
-  - Handles expansion/collapse of item trees
-  - Manages drag and drop interactions
-  - Provides context menu for item operations
+### Expanded Horizontal Layout
 
-- **ItemCard**: Individual item display and editing
-  - Handles item editing and display
-  - Manages focus and keyboard interactions
-  - Supports multi-line text with proper formatting
-
-- **AddItemButton**: Button for adding new items
-  - Appears at the end of each item's children list
-  - Creates new items with default values
-  - Also serves as a drop target for drag and drop
+- When an `ItemFamily` is expanded (`item.isExpanded` is true):
+    - The parent `ItemCard` is rendered on the left.
+    - The children area uses `display: flex` to arrange child groups horizontally.
+    - Child groups are determined by `groupChildren`:
+        - Children *with* their own children are rendered as nested `ItemFamily` components.
+        - Consecutive children *without* their own children are grouped and rendered within a `ChildrenBox` component.
+    - The `ChildrenBox` component uses `display: grid` with a single column (`grid-template-columns: auto`) to render its items vertically.
+    - This creates a mixed horizontal (for groups) and vertical (within non-parent groups) layout.
 
 ### CSS Organization
 
@@ -147,14 +149,17 @@ The project implements several recursive tree operations:
 
 ## Data Flow Patterns
 
-### Item Creation Flow
+### Item Creation Flow (Seamless Addition)
 
-1. User clicks "Add Item" button
-2. `createNewItem` factory function creates a new item with a unique ID
-3. Parent's children array is updated with the new item
-4. Updated parent is submitted to the server via fetcher
-5. Server saves the updated map to storage
-6. Updated map is returned to the client
+1. User clicks on an existing `ItemCard` to edit, or finishes editing a card.
+2. If the user saves a non-empty description for the item currently marked by `addingItemId` context:
+    a. The updated item is saved (via `PUT` request).
+    b. A *new*, empty `Item` is created immediately after the saved item using `createNewItem()`.
+    c. The parent's children array is updated to include both the saved item and the new empty item.
+    d. The `addingItemId` context is updated to the ID of the *new* empty item.
+    e. The updated parent (with both items) is submitted via fetcher (`PUT`).
+    f. The UI focuses the textarea for the new empty item, allowing immediate typing.
+3. If the user saves an empty description for the item marked by `addingItemId`, the item is deleted (`DELETE` request) and `addingItemId` is cleared.
 
 ### Item Update Flow
 
@@ -175,14 +180,15 @@ The project implements several recursive tree operations:
 
 ### Drag and Drop Flow
 
-1. User starts dragging an item
-2. `useStartCardInsert` hook handles drag start
-3. `useAcceptCardInsert` hook handles drag over, leave, and drop events
-4. Visual indicators show potential drop positions
-5. On drop, `moveItem` is called with source and target information
-6. Updated map is submitted to the server via fetcher
-7. Server saves the updated map to storage
-8. Updated map is returned to the client
+1. User starts dragging an item (`useStartCardInsert`).
+2. `ItemFamily` uses different acceptor components based on its `isExpanded` state:
+    - If collapsed: `VerticalDropAcceptor` is used, allowing drops above/below the item.
+    - If expanded: `HorizontalDropAcceptor` is used, allowing drops between the horizontally arranged child groups (but not directly *into* the parent).
+3. `useAcceptCardInsert` hook handles drag over, leave, and drop events.
+4. Visual indicators show potential drop positions.
+5. On drop, `moveItem` service is eventually called (via fetcher `PUT` request) with source and target information.
+6. Server saves the updated map to storage.
+7. Updated map is returned to the client.
 
 ### Clipboard Operations Flow
 
