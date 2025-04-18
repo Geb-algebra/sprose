@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "~/utils/css";
 
 export function BlurOnEnterTextArea(props: {
 	onBlur: React.FocusEventHandler<HTMLTextAreaElement>;
@@ -10,7 +11,10 @@ export function BlurOnEnterTextArea(props: {
 
 	return (
 		<textarea
-			className={props.className}
+			className={cn(
+				props.className,
+				"h-9", // prevents default height being 56px
+			)}
 			defaultValue={props.defaultValue}
 			onBlur={props.onBlur}
 			onCompositionStart={() => setIsComposing(true)}
@@ -23,6 +27,7 @@ export function BlurOnEnterTextArea(props: {
 				}
 			}}
 			onFocus={(e) => {
+				console.log(e.currentTarget.clientHeight);
 				e.currentTarget.style.height = `${Math.max(e.currentTarget.scrollHeight)}px`;
 			}}
 			onInput={(e) => {
