@@ -58,7 +58,7 @@ function DropAcceptor(props: {
 			}
 		} else {
 			// Vertical
-			const buffer = 16; // Vertical buffer
+			const buffer = 20; // Vertical buffer
 			if (!props.disabledInsertAt.includes("before") && e.clientY < rect.top + buffer) {
 				newInsertAt = "before";
 			} else if (!props.disabledInsertAt.includes("after") && e.clientY > rect.bottom - buffer) {
