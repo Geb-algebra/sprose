@@ -49,7 +49,7 @@ export function ItemFamily(props: {
 						<div
 							className={cn(
 								"w-full h-full flex rounded-lg border shadow-sm items-start relative bg-parent-card",
-								item.isExpanded && "h-[150%] rounded-b-none",
+								item.isExpanded && "h-[calc(100%+20px)] rounded-b-none",
 							)}
 						>
 							<ItemCard

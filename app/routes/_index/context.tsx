@@ -55,13 +55,9 @@ export const MapControllerProvider = ({
 		} else {
 			item.description = content;
 			const newMap = updateItem(map, item);
-			if (addingItemId !== item.id) {
-				submitMap(newMap);
-			} else {
-				const newItem = createNewItem("");
-				setAddingItemId(newItem.id);
-				submitMap(addNewItem(parent.id, newMap, newItem, siblingIndex + 1));
-			}
+			const newItem = createNewItem("");
+			setAddingItemId(newItem.id);
+			submitMap(addNewItem(parent.id, newMap, newItem, siblingIndex + 1));
 		}
 	}
 
